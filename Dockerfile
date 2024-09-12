@@ -3,7 +3,7 @@ FROM node:20-slim AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 
-RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates chromium build-essential libcairo2-dev libpango1.0-dev
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates build-essential libcairo2-dev libpango1.0-dev
 
 # We don't need the standalone Chromium
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
