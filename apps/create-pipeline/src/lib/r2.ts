@@ -1,5 +1,5 @@
 import { env } from "@/env";
-import { _Object, S3 } from "@aws-sdk/client-s3";
+import { _Object, paginateListObjectsV2, S3 } from "@aws-sdk/client-s3";
 
 const s3 = new S3({
   endpoint: env.R2_ENDPOINT,
@@ -27,25 +27,18 @@ export const uploadToR2 = async (
 };
 
 export const listAllObjects = async (prefix: string) => {
-  let lastItem: string | undefined = undefined;
-  let hasMore = true;
   const allObjects: Array<_Object> = [];
 
-  while (hasMore) {
-    // @ts-ignore
-    const objects = await s3.listObjectsV2({
+  const paginator = paginateListObjectsV2(
+    { client: s3 },
+    {
       Bucket: env.R2_BUCKET,
       Prefix: prefix,
-      ...((lastItem ? { StartAfter: lastItem } : {}) as any),
-    });
+    },
+  );
 
-    allObjects.push(...(objects.Contents ?? []));
-
-    if (objects.Contents?.length === 0) {
-      hasMore = false;
-    } else {
-      lastItem = objects.Contents?.[objects.Contents.length - 1]?.Key;
-    }
+  for await (const object of paginator) {
+    allObjects.push(...(object.Contents ?? []));
   }
 
   return allObjects;
