@@ -1,12 +1,14 @@
 import { serve } from "@hono/node-server";
 import { showRoutes } from "hono/dev";
 
+console.log("Starting app and loading necessary data...");
+
 import app from "./app";
 import { setUptime } from "./lib/uptime";
 
 showRoutes(app);
 
-let port = 8080;
+let port = 3000;
 if (process.env.PORT) {
   const portInt = parseInt(process.env.PORT);
   if (portInt && !isNaN(portInt)) {

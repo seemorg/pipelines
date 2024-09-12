@@ -6,7 +6,7 @@ export default defineConfig((options: Options) => ({
   clean: true,
   format: "esm",
   platform: "node",
-  target: "node18",
+  target: "node20",
   sourcemap: true,
   // transpile @usul-ocr/db
   // external: ['@usul-ocr/db'],

@@ -1,7 +1,8 @@
 import { env } from "@/env";
 import { uploadToR2 } from "@/lib/r2";
-import { sleep } from "@/lib/utils";
 import Vibrant from "node-vibrant";
+
+import { sleep } from "@usul/utils";
 
 interface CreatePredictionResponse {
   id: string;

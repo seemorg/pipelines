@@ -3,7 +3,7 @@ import path from "path";
 
 import { getContrastColor } from "./color";
 
-const BASE_PATH = "src/book-covers";
+const BASE_PATH = "src/stages/book-covers";
 
 const template = fs
   .readFileSync(path.resolve(BASE_PATH, "templates/template.html"))

@@ -1,11 +1,13 @@
 import { env } from "@/env";
-import S3 from "aws-sdk/clients/s3";
+import { _Object, S3 } from "@aws-sdk/client-s3";
 
 const s3 = new S3({
   endpoint: env.R2_ENDPOINT,
-  accessKeyId: env.R2_ACCESS_KEY_ID,
-  secretAccessKey: env.R2_SECRET_KEY,
-  signatureVersion: "v4",
+  credentials: {
+    accessKeyId: env.R2_ACCESS_KEY_ID,
+    secretAccessKey: env.R2_SECRET_KEY,
+  },
+  region: "auto",
 });
 
 export const uploadToR2 = async (
@@ -15,32 +17,27 @@ export const uploadToR2 = async (
     contentType?: string;
   } = {},
 ) => {
-  await s3
-    .putObject({
-      Bucket: env.R2_BUCKET,
-      Key: key,
-      Body: body,
-      ...(options.contentType && { ContentType: options.contentType }),
-
-      ACL: "public-read",
-    })
-    .promise();
+  await s3.putObject({
+    Bucket: env.R2_BUCKET,
+    Key: key,
+    Body: body,
+    ...(options.contentType && { ContentType: options.contentType }),
+    ACL: "public-read",
+  });
 };
 
 export const listAllObjects = async (prefix: string) => {
   let lastItem: string | undefined = undefined;
   let hasMore = true;
-  const allObjects: S3.ObjectList = [];
+  const allObjects: Array<_Object> = [];
 
   while (hasMore) {
     // @ts-ignore
-    const objects = await s3
-      .listObjectsV2({
-        Bucket: env.R2_BUCKET,
-        Prefix: prefix,
-        ...((lastItem ? { StartAfter: lastItem } : {}) as any),
-      })
-      .promise();
+    const objects = await s3.listObjectsV2({
+      Bucket: env.R2_BUCKET,
+      Prefix: prefix,
+      ...((lastItem ? { StartAfter: lastItem } : {}) as any),
+    });
 
     allObjects.push(...(objects.Contents ?? []));
 
