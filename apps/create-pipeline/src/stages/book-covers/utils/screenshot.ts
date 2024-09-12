@@ -10,7 +10,7 @@ async function getPage() {
     process.platform === "win32"
       ? "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe"
       : process.platform === "linux"
-        ? "/usr/bin/google-chrome"
+        ? (process.env.PUPPETEER_EXECUTABLE_PATH ?? "/usr/bin/google-chrome")
         : "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
 
   const options = {
