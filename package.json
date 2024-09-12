@@ -1,5 +1,5 @@
 {
-  "name": "create-t3-turbo",
+  "name": "pipelines",
   "private": true,
   "engines": {
     "node": ">=20.15.0"
@@ -9,10 +9,10 @@
     "build": "turbo run build",
     "clean": "git clean -xdf node_modules",
     "clean:workspaces": "turbo run clean",
-    "db:push": "turbo -F @acme/db push",
-    "db:studio": "turbo -F @acme/db studio",
+    "db:push": "turbo -F @usul/db push",
+    "db:studio": "turbo -F @usul/db studio",
     "dev": "turbo watch dev",
-    "dev:web": "turbo watch dev -F @acme/web...",
+    "dev:web": "turbo watch dev -F @usul/web...",
     "format": "turbo run format --continue -- --cache --cache-location .cache/.prettiercache",
     "format:fix": "turbo run format --continue -- --write --cache --cache-location .cache/.prettiercache",
     "lint": "turbo run lint --continue -- --cache --cache-location .cache/.eslintcache",
@@ -23,11 +23,11 @@
     "ui-add": "turbo run ui-add"
   },
   "devDependencies": {
-    "@acme/prettier-config": "workspace:*",
     "@turbo/gen": "^2.0.8",
+    "@usul/prettier-config": "workspace:*",
     "prettier": "catalog:",
     "turbo": "^2.0.8",
     "typescript": "catalog:"
   },
-  "prettier": "@acme/prettier-config"
+  "prettier": "@usul/prettier-config"
 }

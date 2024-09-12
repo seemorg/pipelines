@@ -21,7 +21,7 @@ const config = {
     "<THIRD_PARTY_MODULES>",
     "",
     "<TYPES>^@acme",
-    "^@acme/(.*)$",
+    "^@usul/(.*)$",
     "",
     "<TYPES>^[.|..|~]",
     "^~/",

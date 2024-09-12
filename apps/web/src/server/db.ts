@@ -1,8 +1,8 @@
-// TODO: Uncomment the code below and replace the `@acme/db` import with the correct path to the Prisma client.
+// TODO: Uncomment the code below and replace the `@usul/db` import with the correct path to the Prisma client.
 
 // import { env } from "@/env";
 
-// import { PrismaClient } from "@acme/db";
+// import { PrismaClient } from "@usul/db";
 
 // const createPrismaClient = () =>
 //   new PrismaClient({

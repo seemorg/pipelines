@@ -1,0 +1,61 @@
+import fs from "fs";
+import path from "path";
+
+import { getContrastColor } from "./color";
+
+const BASE_PATH = "src/book-covers";
+
+const template = fs
+  .readFileSync(path.resolve(BASE_PATH, "templates/template.html"))
+  .toString();
+
+const collectionTemplate = fs
+  .readFileSync(path.resolve(BASE_PATH, "templates/collection-template.html"))
+  .toString();
+
+const font = fs
+  .readFileSync(path.resolve(BASE_PATH, "fonts/Amiri-Regular.ttf"))
+  .toString("base64");
+
+export const getBookHtml = ({
+  title,
+  author,
+  containerColor,
+  bgBase64,
+}: {
+  title: string;
+  author: string;
+  containerColor: string;
+  bgBase64: string;
+}) => {
+  // black or white, depending on the background contrast
+  const textColor = getContrastColor(containerColor);
+
+  return template
+    .replaceAll("{{title}}", title)
+    .replaceAll("{{author}}", author)
+    .replaceAll("{{containerColor}}", containerColor)
+    .replaceAll("{{textColor}}", textColor)
+    .replaceAll("{{bgBase64}}", bgBase64)
+    .replaceAll("{{font}}", font);
+};
+
+export const getCollectionHtml = ({
+  title,
+  containerColor,
+  bgBase64,
+}: {
+  title: string;
+  containerColor: string;
+  bgBase64: string;
+}) => {
+  // black or white, depending on the background contrast
+  const textColor = getContrastColor(containerColor);
+
+  return collectionTemplate
+    .replaceAll("{{title}}", title)
+    .replaceAll("{{containerColor}}", containerColor)
+    .replaceAll("{{textColor}}", textColor)
+    .replaceAll("{{bgBase64}}", bgBase64)
+    .replaceAll("{{font}}", font);
+};

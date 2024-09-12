@@ -1,0 +1,25 @@
+{
+  "name": "@usul/utils",
+  "version": "0.0.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "clean": "rm -rf .turbo dist node_modules",
+    "format": "prettier --check . --ignore-path ../../.gitignore",
+    "lint": "eslint"
+  },
+  "prettier": "@usul/prettier-config",
+  "devDependencies": {
+    "@usul/eslint-config": "workspace:*",
+    "@usul/prettier-config": "workspace:*",
+    "@usul/tsconfig": "workspace:*",
+    "eslint": "catalog:",
+    "prettier": "catalog:",
+    "prisma": "^5.17.0",
+    "tsup": "^8.0.2",
+    "typescript": "catalog:"
+  }
+}

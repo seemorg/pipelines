@@ -1,5 +1,5 @@
 {
-  "name": "@acme/web",
+  "name": "@usul/web",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -31,13 +31,13 @@
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@acme/eslint-config": "workspace:*",
-    "@acme/prettier-config": "workspace:*",
-    "@acme/tailwind-config": "workspace:*",
-    "@acme/tsconfig": "workspace:*",
     "@types/node": "^20.14.9",
     "@types/react": "catalog:react18",
     "@types/react-dom": "catalog:react18",
+    "@usul/eslint-config": "workspace:*",
+    "@usul/prettier-config": "workspace:*",
+    "@usul/tailwind-config": "workspace:*",
+    "@usul/tsconfig": "workspace:*",
     "dotenv-cli": "^7.4.2",
     "eslint": "catalog:",
     "jiti": "^1.21.6",
@@ -45,5 +45,5 @@
     "tailwindcss": "^3.4.4",
     "typescript": "catalog:"
   },
-  "prettier": "@acme/prettier-config"
+  "prettier": "@usul/prettier-config"
 }
