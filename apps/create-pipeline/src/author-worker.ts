@@ -1,54 +1,33 @@
-import type { TurathAllDataResponse } from "@usul/utils";
 import { Worker } from "bullmq";
 import slugify from "slugify";
 
-import { getTurathAuthors, removeDiacritics } from "@usul/utils";
+import { removeDiacritics } from "@usul/utils";
 
 import type { AuthorQueueData } from "./author-queue";
+import { AUTHORS_QUEUE_NAME, AUTHORS_QUEUE_REDIS } from "./author-queue";
 import {
-  AUTHORS_QUEUE_NAME,
-  AUTHORS_QUEUE_REDIS,
-  authorsQueue,
-} from "./author-queue";
-import { db } from "./lib/db";
+  getAuthorSlugs,
+  getExistingTurathAuthorIds,
+  getTurathAuthorsById,
+} from "./lib/data";
 import { languages, languagesWithoutEnglish } from "./lib/languages";
 import { generateBiography } from "./stages/biography";
 import { localizeName } from "./stages/localization";
 import { transliterateName } from "./stages/transliteration";
 import { generateVariations } from "./stages/variations";
 
-// import { BookStatus } from "@usul-ocr/db";
-
-const authors = await db.author.findMany({ select: { id: true, slug: true } });
-const slugs = new Set<string>(authors.map((author) => author.slug));
-const existingTurathAuthorIds = new Set<string>(
-  (await authorsQueue.getCompleted())
-    .map((job) => job.data.turathId.toString())
-    .concat(
-      authors
-        .filter((a) => a.id.startsWith("turath:"))
-        .map((author) => author.id.split(":")[1]!),
-    ),
-);
-
-const turathAuthorsById = (await getTurathAuthors()).reduce(
-  (acc, author) => {
-    acc[author.id] = author;
-    return acc;
-  },
-  {} as Record<number, TurathAllDataResponse["authors"][number]>,
-);
-
 export const worker = new Worker<AuthorQueueData>(
   AUTHORS_QUEUE_NAME,
   async (job) => {
     const { turathId } = job.data;
 
+    const turathAuthorsById = await getTurathAuthorsById();
     const turathAuthor = turathAuthorsById[turathId];
     if (!turathAuthor) {
       throw new Error(`Turath author with id ${turathId} not found`);
     }
 
+    const existingTurathAuthorIds = await getExistingTurathAuthorIds();
     if (existingTurathAuthorIds.has(turathId.toString())) {
       return { skipped: true };
     }
@@ -68,6 +47,7 @@ export const worker = new Worker<AuthorQueueData>(
       throw new Error("Failed to localize name");
     }
 
+    const slugs = await getAuthorSlugs();
     // 2. create slug
     const baseSlug = slugify(removeDiacritics(englishName), { lower: true });
     let slug = baseSlug;

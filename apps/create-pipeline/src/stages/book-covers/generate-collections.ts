@@ -1,6 +1,5 @@
 import fs from "fs/promises";
 import path from "path";
-import { listAllObjects } from "@/lib/r2";
 import slugify from "slugify";
 
 import { ensureDir } from "@usul/utils";

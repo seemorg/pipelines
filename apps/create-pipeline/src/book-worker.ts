@@ -1,51 +1,33 @@
-import type { TurathAllDataResponse } from "@usul/utils";
 import { Worker } from "bullmq";
 import slugify from "slugify";
 
-import {
-  getTurathAuthors,
-  getTurathBooks,
-  removeDiacritics,
-} from "@usul/utils";
+import { removeDiacritics } from "@usul/utils";
 
 import type { BookQueueData } from "./book-queue";
 import { BOOKS_QUEUE_NAME, BOOKS_QUEUE_REDIS } from "./book-queue";
-import { db } from "./lib/db";
+import {
+  getBookSlugs,
+  getTurathAuthorsById,
+  getTurathBooksById,
+} from "./lib/data";
 import { languagesWithoutEnglish } from "./lib/languages";
 import { generateBookCoverAndUploadToR2 } from "./stages/book-covers/generate";
 import { localizeName } from "./stages/localization";
 import { transliterateName } from "./stages/transliteration";
 import { generateVariations } from "./stages/variations";
 
-const slugs = new Set<string>(
-  (await db.book.findMany({ select: { slug: true } })).map((book) => book.slug),
-);
-
-const turathBooksById = (await getTurathBooks()).reduce(
-  (acc, book) => {
-    acc[book.id] = book;
-    return acc;
-  },
-  {} as Record<number, TurathAllDataResponse["books"][number]>,
-);
-
-const turathAuthorsById = (await getTurathAuthors()).reduce(
-  (acc, author) => {
-    acc[author.id] = author;
-    return acc;
-  },
-  {} as Record<number, TurathAllDataResponse["authors"][number]>,
-);
-
 export const worker = new Worker<BookQueueData>(
   BOOKS_QUEUE_NAME,
   async (job) => {
     const { turathId } = job.data;
 
+    const turathBooksById = await getTurathBooksById();
     const turathBook = turathBooksById[turathId];
     if (!turathBook) {
       throw new Error(`Turath book with id ${turathId} not found`);
     }
+
+    const turathAuthorsById = await getTurathAuthorsById();
 
     const turathAuthor = turathAuthorsById[turathBook.author_id];
     if (!turathAuthor) {
@@ -71,6 +53,7 @@ export const worker = new Worker<BookQueueData>(
     }
 
     // 2. create slug
+    const slugs = await getBookSlugs();
     const baseSlug = slugify(removeDiacritics(englishName), { lower: true });
     let slug = baseSlug;
     let i = 1;
