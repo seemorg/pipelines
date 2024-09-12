@@ -3,7 +3,8 @@ FROM node:20-slim AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 
-RUN apk add --no-cache ca-certificates chromium build-essential libcairo2-dev libpango1.0-dev
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates chromium build-essential libcairo2-dev libpango1.0-dev
+
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
 ENV PUPPETEER_EXECUTABLE_PATH /usr/bin/chromium-browser
 
