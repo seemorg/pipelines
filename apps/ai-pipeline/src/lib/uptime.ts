@@ -1,4 +1,4 @@
-import { formatTime } from "./utils";
+import { formatTime } from "@usul/utils";
 
 let startDate: Date | null;
 
