@@ -28,6 +28,5 @@ COPY --from=build /app/packages /app/packages
 COPY --from=build /app/tooling /app/tooling
 
 EXPOSE 8080
-RUN cd apps/create-pipeline
 
-CMD [ "pnpm", "start" ]
+CMD [ "pnpm", "start:create-pipeline" ]
