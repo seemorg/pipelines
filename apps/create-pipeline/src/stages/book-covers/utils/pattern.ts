@@ -153,17 +153,17 @@ export async function generatePatternWithColors(
     patternUrl = `https://assets.digitalseem.org/${key}`;
     pattern = await fetch(patternUrl);
     patternBuffer = Buffer.from(await pattern.arrayBuffer());
-
-    // Check if the pattern size is 842 bytes
-    if (patternBuffer.length === 842) {
-      console.log("Invalid pattern size detected. Regenerating...");
-      patternBuffer = await generateNewPattern();
-      if (!patternBuffer) return;
-      override = true;
-    }
   } else {
     patternBuffer = await generateNewPattern();
     if (!patternBuffer) return;
+  }
+
+  // Check if the pattern size is 842 bytes
+  if (patternBuffer.length === 842) {
+    console.log("Invalid pattern size detected. Regenerating...");
+    patternBuffer = await generateNewPattern();
+    if (!patternBuffer) return;
+    override = true;
   }
 
   if (!objects.has(key) || override) {

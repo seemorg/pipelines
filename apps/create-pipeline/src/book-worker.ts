@@ -54,7 +54,13 @@ export const worker = new Worker<BookQueueData>(
 
     // 2. create slug
     const slugs = await getBookSlugs();
-    const baseSlug = slugify(removeDiacritics(englishName), { lower: true });
+    const baseSlug = slugify(removeDiacritics(englishName), {
+      lower: true,
+      trim: true,
+      // remove special characters
+      remove: /[*+~.()'"!:@]/g,
+    });
+
     let slug = baseSlug;
     let i = 1;
     while (slugs.has(slug)) {
@@ -105,5 +111,6 @@ export const worker = new Worker<BookQueueData>(
   },
   {
     connection: BOOKS_QUEUE_REDIS,
+    concurrency: 10,
   },
 );
