@@ -120,6 +120,6 @@ export const worker = new Worker<AuthorQueueData>(
   },
   {
     connection: AUTHORS_QUEUE_REDIS,
-    concurrency: 10,
+    concurrency: 5,
   },
 );

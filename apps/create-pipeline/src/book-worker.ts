@@ -111,6 +111,6 @@ export const worker = new Worker<BookQueueData>(
   },
   {
     connection: BOOKS_QUEUE_REDIS,
-    concurrency: 10,
+    concurrency: 5,
   },
 );
