@@ -17,7 +17,7 @@
     "@bull-board/api": "^5.21.1",
     "@bull-board/hono": "^5.21.1",
     "@hono/node-server": "^1.12.0",
-    "@openiti/markdown-parser": "^1.0.1",
+    "@openiti/markdown-parser": "^1.2.2",
     "@qdrant/js-client-rest": "^1.10.0",
     "@t3-oss/env-core": "^0.10.1",
     "@usul/db": "workspace:*",

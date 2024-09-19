@@ -11,7 +11,7 @@ import { stripHtml } from "string-strip-html";
 import { chunk, getTurathBookById, removeDiacritics, sleep } from "@usul/utils";
 
 import { attachMetadataToNodes } from "../lib/metadata";
-import { createVectorStore } from "../lib/vector-store";
+import { createVectorIndex } from "../lib/vector-store";
 
 const splitter = new SentenceSplitter({
   splitLongSentences: true,
@@ -20,19 +20,7 @@ const parser = new SimpleNodeParser({
   textSplitter: splitter,
 });
 
-const vectorStore = createVectorStore("DEV");
-
-let collectionExists = false;
-try {
-  await vectorStore.client().getCollection(env.QDRANT_COLLECTION);
-  collectionExists = true;
-} catch (e) {}
-if (!collectionExists) {
-  console.log("Creating collection...");
-  await vectorStore.createCollection(env.QDRANT_COLLECTION, 3072);
-}
-
-const index = await VectorStoreIndex.fromVectorStore(vectorStore);
+const index = await createVectorIndex("DEV");
 const books = await getBooksData();
 
 export async function indexTurathBook(

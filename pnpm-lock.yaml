@@ -76,8 +76,8 @@ importers:
         specifier: ^1.12.0
         version: 1.12.2(hono@4.5.11)
       '@openiti/markdown-parser':
-        specifier: ^1.0.1
-        version: 1.0.1
+        specifier: ^1.2.2
+        version: 1.2.2
       '@qdrant/js-client-rest':
         specifier: ^1.10.0
         version: 1.11.0(typescript@5.5.3)
@@ -405,7 +405,7 @@ importers:
         version: 7.35.0(eslint@9.7.0)
       eslint-plugin-react-hooks:
         specifier: rc
-        version: 5.1.0-rc-94e652d5-20240912(eslint@9.7.0)
+        version: 5.1.0-rc-a99d8e8d-20240916(eslint@9.7.0)
       eslint-plugin-turbo:
         specifier: ^2.0.8
         version: 2.0.8(eslint@9.7.0)
@@ -1387,8 +1387,8 @@ packages:
     resolution: {integrity: sha512-XhdSY/4B1D34tSco/GION+23GMjaS9S2zszcqYkMHo8RcWInymF6L1x+Gk7EmHdrSxNFva2WM8orhC4BwQCwgw==}
     engines: {node: '>=12'}
 
-  '@openiti/markdown-parser@1.0.1':
-    resolution: {integrity: sha512-utSQoSa72ChxEqXWe7lcTduqCCsso429dMGbWCBWffzx9DibR26MuP80ktsJswdD+n0wBlS2c3n5rAz1wyAFww==}
+  '@openiti/markdown-parser@1.2.2':
+    resolution: {integrity: sha512-ZmaZ2LAyXCzAAQAMrRbWbO9aJcenG7VZRUvWMj4QdTWToNM/xugpCa5sx9ES+hMrNIlZShv+uLrfg5Tk43j/Nw==}
     engines: {node: '>=12'}
 
   '@opentelemetry/api@1.9.0':
@@ -2785,8 +2785,8 @@ packages:
     peerDependencies:
       eslint: ^3 || ^4 || ^5 || ^6 || ^7 || ^8
 
-  eslint-plugin-react-hooks@5.1.0-rc-94e652d5-20240912:
-    resolution: {integrity: sha512-m9GVeutJUdvfTIC/1f21NurvYm4daYbVZRfNOJEhL6oFB42uxrOBU2LJQSfixzm1px5QskS6rKInuadut4BYtQ==}
+  eslint-plugin-react-hooks@5.1.0-rc-a99d8e8d-20240916:
+    resolution: {integrity: sha512-8sJ7eyk9p+Ph7hde05UPm0FGp1TCcEqPQ0EndQpxHrpo3O4PEq178dWmtVs9Ys9ym3+zNijv3b/SryF65R5SJQ==}
     engines: {node: '>=10'}
     peerDependencies:
       eslint: ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0-0 || ^9.0.0
@@ -6569,7 +6569,7 @@ snapshots:
     transitivePeerDependencies:
       - encoding
 
-  '@openiti/markdown-parser@1.0.1': {}
+  '@openiti/markdown-parser@1.2.2': {}
 
   '@opentelemetry/api@1.9.0':
     optional: true
@@ -8342,7 +8342,7 @@ snapshots:
       safe-regex-test: 1.0.3
       string.prototype.includes: 2.0.0
 
-  eslint-plugin-react-hooks@5.1.0-rc-94e652d5-20240912(eslint@9.7.0):
+  eslint-plugin-react-hooks@5.1.0-rc-a99d8e8d-20240916(eslint@9.7.0):
     dependencies:
       eslint: 9.7.0
 
