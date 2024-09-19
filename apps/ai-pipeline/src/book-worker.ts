@@ -4,9 +4,32 @@ import type { BookQueueData } from "./book-queue";
 import { BOOKS_QUEUE_NAME, BOOKS_QUEUE_REDIS } from "./book-queue";
 import { indexOpenitiBook } from "./indexer/openiti";
 import { indexTurathBook } from "./indexer/turath";
+import { db } from "./lib/db";
 import { getBooksData } from "./lib/services/books";
 
 const booksData = await getBooksData();
+
+const updateBookFlags = async (
+  book: {
+    id: string;
+    flags: PrismaJson.BookFlags;
+  },
+  versionId: string,
+) => {
+  // update book flags
+  await db.book.update({
+    where: {
+      id: book.id,
+    },
+    data: {
+      flags: {
+        ...book.flags,
+        aiSupported: true,
+        aiVersion: versionId,
+      } as PrismaJson.BookFlags,
+    },
+  });
+};
 
 export const worker = new Worker<BookQueueData>(
   BOOKS_QUEUE_NAME,
@@ -26,6 +49,11 @@ export const worker = new Worker<BookQueueData>(
 
     if (hasTurathBook) {
       const result = await indexTurathBook({ id });
+
+      if (result.status === "success") {
+        await updateBookFlags(book, String(result.versionId!));
+      }
+
       return result;
     }
 
@@ -33,6 +61,10 @@ export const worker = new Worker<BookQueueData>(
     const result = await indexOpenitiBook({ id });
     if (result.status !== "success" && result.status !== "skipped") {
       throw new Error(JSON.stringify(result));
+    }
+
+    if (result.status === "success") {
+      await updateBookFlags(book, result.versionId!);
     }
 
     return result;

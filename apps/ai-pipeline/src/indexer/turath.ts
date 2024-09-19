@@ -116,5 +116,5 @@ export async function indexTurathBook(
     i++;
   }
 
-  return { status: "success" };
+  return { status: "success", versionId: turathBook.meta.id };
 }

@@ -151,7 +151,7 @@ export async function getOpenitiNodes(params: {
     };
   }
 
-  return { status: "success" as const, nodes };
+  return { status: "success" as const, nodes, versionId: openitiVersion };
 }
 
 export async function indexOpenitiBook(params: { id: string }) {
@@ -191,5 +191,5 @@ export async function indexOpenitiBook(params: { id: string }) {
     i++;
   }
 
-  return { status: "success" };
+  return { status: "success", versionId: result.versionId };
 }
