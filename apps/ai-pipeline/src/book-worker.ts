@@ -9,6 +9,10 @@ import { getBooksData } from "./lib/services/books";
 
 const booksData = await getBooksData();
 
+const aiSupportedBooks = new Set(
+  booksData.filter((b) => b.flags.aiSupported).map((b) => b.id),
+);
+
 const updateBookFlags = async (
   book: {
     id: string;
@@ -29,6 +33,7 @@ const updateBookFlags = async (
       } as PrismaJson.BookFlags,
     },
   });
+  aiSupportedBooks.add(book.id);
 };
 
 export const worker = new Worker<BookQueueData>(
@@ -41,7 +46,7 @@ export const worker = new Worker<BookQueueData>(
       throw new Error(`Book not found: ${id}`);
     }
 
-    if (book.flags.aiSupported) {
+    if (aiSupportedBooks.has(id)) {
       return { skipped: true };
     }
 
