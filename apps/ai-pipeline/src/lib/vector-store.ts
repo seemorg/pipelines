@@ -1,6 +1,12 @@
 import { env } from "@/env";
 import { QdrantClient } from "@qdrant/js-client-rest";
-import { QdrantVectorStore, VectorStoreIndex } from "llamaindex";
+import {
+  QdrantVectorStore,
+  serviceContextFromDefaults,
+  VectorStoreIndex,
+} from "llamaindex";
+
+import { createAzureOpenAI, createAzureOpenAIEmbeddings } from "./openai";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const createVectorStore = (_mode: "DEV" | "PROD" = "PROD") => {
@@ -35,6 +41,12 @@ export const createVectorIndex = async (_mode: "DEV" | "PROD" = "PROD") => {
     await vectorStore.createCollection(env.QDRANT_COLLECTION, 3072);
   }
 
-  index = await VectorStoreIndex.fromVectorStore(vectorStore);
+  index = await VectorStoreIndex.fromVectorStore(
+    vectorStore,
+    serviceContextFromDefaults({
+      embedModel: createAzureOpenAIEmbeddings(),
+      llm: createAzureOpenAI(),
+    }),
+  );
   return index;
 };
