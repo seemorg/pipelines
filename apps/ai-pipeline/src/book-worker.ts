@@ -77,7 +77,7 @@ export const worker = new Worker<BookQueueData>(
   {
     connection: BOOKS_QUEUE_REDIS,
     concurrency: 3,
-    lockDuration: 1000 * 60 * 30, // 30 minutes
-    stalledInterval: 1000 * 60 * 30, // 30 minutes
+    lockDuration: 1000 * 60 * 40, // 40 minutes
+    stalledInterval: 1000 * 60 * 40, // 40 minutes
   },
 );

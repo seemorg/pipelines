@@ -45,12 +45,13 @@ const getVersionName = (version: string) => {
 };
 
 const getHighestPriorityVersion = (versions: string[]) => {
-  const versionsNames = versions.map(getVersionName);
-  const sorted = versionsNames.sort((a, b) => {
-    return versionsPriority.indexOf(a!) - versionsPriority.indexOf(b!);
+  const sortedVersions = versions.sort((a, b) => {
+    const nameA = getVersionName(a);
+    const nameB = getVersionName(b);
+    return versionsPriority.indexOf(nameA!) - versionsPriority.indexOf(nameB!);
   });
 
-  return sorted[0];
+  return sortedVersions[0];
 };
 
 const splitter = new SentenceSplitter({
