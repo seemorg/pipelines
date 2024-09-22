@@ -104,6 +104,14 @@ export async function indexTurathBook(
             await index.insertNodes(batch);
             success = true;
           } catch (e: any) {
+            if (
+              e.message?.includes(
+                "400 This model's maximum context length is 8192 tokens",
+              )
+            ) {
+              throw e;
+            }
+
             console.error(
               `Failed to insert batch (${i} -> ${chunkI}) / ${batches.length}. (${e.message})`,
             );
