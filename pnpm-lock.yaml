@@ -160,6 +160,9 @@ importers:
       '@hono/node-server':
         specifier: ^1.12.0
         version: 1.12.2(hono@4.5.11)
+      '@hono/zod-validator':
+        specifier: ^0.4.1
+        version: 0.4.1(hono@4.5.11)(zod@3.23.8)
       '@t3-oss/env-core':
         specifier: ^0.10.1
         version: 0.10.1(typescript@5.5.3)(zod@3.23.8)
@@ -405,7 +408,7 @@ importers:
         version: 7.35.0(eslint@9.7.0)
       eslint-plugin-react-hooks:
         specifier: rc
-        version: 5.1.0-rc-a99d8e8d-20240916(eslint@9.7.0)
+        version: 5.1.0-rc-bf7e210c-20241017(eslint@9.7.0)
       eslint-plugin-turbo:
         specifier: ^2.0.8
         version: 2.0.8(eslint@9.7.0)
@@ -1148,6 +1151,12 @@ packages:
     engines: {node: '>=18.14.1'}
     peerDependencies:
       hono: ^4
+
+  '@hono/zod-validator@0.4.1':
+    resolution: {integrity: sha512-I8LyfeJfvVmC5hPjZ2Iij7RjexlgSBT7QJudZ4JvNPLxn0JQ3sqclz2zydlwISAnw21D2n4LQ0nfZdoiv9fQQA==}
+    peerDependencies:
+      hono: '>=3.9.0'
+      zod: ^3.19.1
 
   '@huggingface/inference@2.8.0':
     resolution: {integrity: sha512-Ti681P1qckcCAqgzmL53jBnluPuZGelmMIuXNjgAwC5+RIjF4S0SDQu6oy44ZTwekwNp2ETaZ2sXsOk+45aC4w==}
@@ -2785,8 +2794,8 @@ packages:
     peerDependencies:
       eslint: ^3 || ^4 || ^5 || ^6 || ^7 || ^8
 
-  eslint-plugin-react-hooks@5.1.0-rc-a99d8e8d-20240916:
-    resolution: {integrity: sha512-8sJ7eyk9p+Ph7hde05UPm0FGp1TCcEqPQ0EndQpxHrpo3O4PEq178dWmtVs9Ys9ym3+zNijv3b/SryF65R5SJQ==}
+  eslint-plugin-react-hooks@5.1.0-rc-bf7e210c-20241017:
+    resolution: {integrity: sha512-rMvFpYu5Qfa3pN4Rp8RL9Fz4jX9oTUP4wvdTJgvEbvV/4GH13WdUgXpDpSEKVDtosZncdWL08ljShCS3Vy3+wg==}
     engines: {node: '>=10'}
     peerDependencies:
       eslint: ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0-0 || ^9.0.0
@@ -6319,6 +6328,11 @@ snapshots:
     dependencies:
       hono: 4.5.11
 
+  '@hono/zod-validator@0.4.1(hono@4.5.11)(zod@3.23.8)':
+    dependencies:
+      hono: 4.5.11
+      zod: 3.23.8
+
   '@huggingface/inference@2.8.0':
     dependencies:
       '@huggingface/tasks': 0.11.13
@@ -8342,7 +8356,7 @@ snapshots:
       safe-regex-test: 1.0.3
       string.prototype.includes: 2.0.0
 
-  eslint-plugin-react-hooks@5.1.0-rc-a99d8e8d-20240916(eslint@9.7.0):
+  eslint-plugin-react-hooks@5.1.0-rc-bf7e210c-20241017(eslint@9.7.0):
     dependencies:
       eslint: 9.7.0
 

@@ -10,6 +10,7 @@ import {
   getTurathAuthorsById,
   getTurathBooksById,
 } from "./lib/data";
+import { db } from "./lib/db";
 import { languagesWithoutEnglish } from "./lib/languages";
 import { generateBookCoverAndUploadToR2 } from "./stages/book-covers/generate";
 import { localizeName } from "./stages/localization";
@@ -19,25 +20,39 @@ import { generateVariations } from "./stages/variations";
 export const worker = new Worker<BookQueueData>(
   BOOKS_QUEUE_NAME,
   async (job) => {
-    const { turathId } = job.data;
+    const data = job.data;
 
-    const turathBooksById = await getTurathBooksById();
-    const turathBook = turathBooksById[turathId];
-    if (!turathBook) {
-      throw new Error(`Turath book with id ${turathId} not found`);
+    let arabicName: string;
+    let authorArabicName: string;
+    let slug: string;
+    let transliteration: string | null = null;
+
+    const isTurath = "turathId" in data;
+
+    if (isTurath) {
+      const { turathId } = data;
+
+      const turathBooksById = await getTurathBooksById();
+      const turathBook = turathBooksById[turathId];
+      if (!turathBook) {
+        throw new Error(`Turath book with id ${turathId} not found`);
+      }
+
+      const turathAuthorsById = await getTurathAuthorsById();
+
+      const turathAuthor = turathAuthorsById[turathBook.author_id];
+      if (!turathAuthor) {
+        throw new Error(
+          `Turath author with id ${turathBook.author_id} not found`,
+        );
+      }
+
+      arabicName = turathBook.name;
+      authorArabicName = turathAuthor.name;
+    } else {
+      arabicName = data.arabicName;
+      authorArabicName = data.authorArabicName;
     }
-
-    const turathAuthorsById = await getTurathAuthorsById();
-
-    const turathAuthor = turathAuthorsById[turathBook.author_id];
-    if (!turathAuthor) {
-      throw new Error(
-        `Turath author with id ${turathBook.author_id} not found`,
-      );
-    }
-
-    const arabicName = turathBook.name;
-    const authorArabicName = turathAuthor.name;
 
     // 1. localize name
     const englishName = await localizeName(
@@ -52,22 +67,26 @@ export const worker = new Worker<BookQueueData>(
       throw new Error("Failed to localize name");
     }
 
-    // 2. create slug
-    const slugs = await getBookSlugs();
-    const baseSlug = slugify(removeDiacritics(englishName), {
-      lower: true,
-      trim: true,
-      // remove special characters
-      remove: /[*+~.()'"!:@]/g,
-    });
+    // 2. create slug (if turath only)
+    if (isTurath) {
+      const slugs = await getBookSlugs();
+      const baseSlug = slugify(removeDiacritics(englishName), {
+        lower: true,
+        trim: true,
+        // remove special characters
+        remove: /[*+~.()'"!:@]/g,
+      });
 
-    let slug = baseSlug;
-    let i = 1;
-    while (slugs.has(slug)) {
-      slug = `${baseSlug}-${i}`;
-      i++;
+      slug = baseSlug;
+      let i = 1;
+      while (slugs.has(slug)) {
+        slug = `${baseSlug}-${i}`;
+        i++;
+      }
+      slugs.add(slug);
+    } else {
+      slug = data.slug;
     }
-    slugs.add(slug);
 
     // 3. localize name in other languages
     const localizedNames = (
@@ -86,10 +105,14 @@ export const worker = new Worker<BookQueueData>(
           };
         }),
       )
-    ).filter((name) => name.text !== null);
+    ).filter(
+      (name): name is { locale: string; text: string } => name.text !== null,
+    );
 
-    // 4. transliterate name
-    const transliteration = await transliterateName(arabicName, "book");
+    if (isTurath) {
+      // 4. transliterate name
+      transliteration = await transliterateName(arabicName, "book");
+    }
 
     // 5. create variations in each language
     const variations = await generateVariations(englishName, "book");
@@ -101,13 +124,39 @@ export const worker = new Worker<BookQueueData>(
       slug,
     });
 
-    return {
+    const finalData = {
       slug,
       primaryNames: [{ locale: "en", text: englishName }, ...localizedNames],
       variations,
       transliteration,
       cover: bookCover?.url,
     };
+
+    if (!isTurath) {
+      // this means the request is coming from the usul admin panel
+      // so we need to update the book data
+      const book = await db.book.findFirst({ where: { slug } });
+      if (!book) {
+        throw new Error(`Book with slug ${slug} not found`);
+      }
+
+      await db.book.update({
+        where: { id: book.id },
+        data: {
+          primaryNameTranslations: {
+            upsert: finalData.primaryNames.map((name) => ({
+              where: {
+                bookId_locale: { bookId: book.id, locale: name.locale },
+              },
+              update: { text: name.text },
+              create: { text: name.text, locale: name.locale },
+            })),
+          },
+        },
+      });
+    }
+
+    return finalData;
   },
   {
     connection: BOOKS_QUEUE_REDIS,

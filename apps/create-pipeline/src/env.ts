@@ -23,6 +23,7 @@ export const env = createEnv({
     R2_SECRET_KEY: z.string().min(1),
     R2_ENDPOINT: z.string().min(1),
     R2_BUCKET: z.string().min(1),
+    USUL_PIPELINE_API_KEY: z.string().min(1),
   },
 
   /**
