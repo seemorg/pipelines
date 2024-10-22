@@ -1,10 +1,7 @@
-import { authorsQueue } from "@/author-queue";
+import type { TurathAllDataResponse } from "@usul/utils";
+import { authorsQueue } from "@/queues/author/author-queue";
 
-import {
-  getTurathAuthors,
-  getTurathBooks,
-  TurathAllDataResponse,
-} from "@usul/utils";
+import { getTurathAuthors, getTurathBooks } from "@usul/utils";
 
 import { db } from "./db";
 import { listAllObjects } from "./r2";
