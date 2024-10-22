@@ -30,6 +30,9 @@ model Author {
 
   books     Book[]
   locations Location[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
 }
 
 model AuthorBio {
@@ -83,6 +86,12 @@ model Book {
   advancedGenres AdvancedGenre[]
   author         Author          @relation(fields: [authorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   authorId       String
+
+  physicalDetails String?
+  coverImageUrl   String?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
 }
 
 model BookPrimaryName {
@@ -117,6 +126,9 @@ model Genre {
 
   numberOfBooks Int    @default(0)
   books         Book[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
 }
 
 model GenreName {
@@ -141,6 +153,9 @@ model AdvancedGenre {
 
   numberOfBooks Int    @default(0)
   books         Book[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
 }
 
 model AdvancedGenreName {
@@ -173,6 +188,9 @@ model Location {
   region   Region? @relation(fields: [regionId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   regionId String?
 
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+
   @@unique([slug, type])
 }
 
@@ -199,6 +217,9 @@ model Region {
   numberOfAuthors Int        @default(0)
   numberOfBooks   Int        @default(0)
   locations       Location[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
 }
 
 model RegionCurrentName {

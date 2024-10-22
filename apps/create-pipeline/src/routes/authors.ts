@@ -1,4 +1,4 @@
-import { authorsQueue } from "@/author-queue";
+import { authorsQueue } from "@/queues/author/author-queue";
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { bearerAuth } from "hono/bearer-auth";

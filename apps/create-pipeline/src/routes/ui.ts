@@ -1,3 +1,6 @@
+import { authorsQueue } from "@/queues/author/author-queue";
+import { bookCoversQueue } from "@/queues/book-cover/book-cover-queue";
+import { booksQueue } from "@/queues/book/book-queue";
 import { createBullBoard } from "@bull-board/api";
 import { BullMQAdapter } from "@bull-board/api/dist/src/queueAdapters/bullMQ.js";
 import { HonoAdapter } from "@bull-board/hono";
@@ -5,8 +8,6 @@ import { serveStatic } from "@hono/node-server/serve-static";
 import { Hono } from "hono";
 import { basicAuth } from "hono/basic-auth";
 
-import { authorsQueue } from "../author-queue";
-import { booksQueue } from "../book-queue";
 import { env } from "../env";
 
 const basePath = "/ui";
@@ -22,7 +23,11 @@ uiRoutes.use(
 const serverAdapter = new HonoAdapter(serveStatic).setBasePath(basePath);
 
 createBullBoard({
-  queues: [new BullMQAdapter(booksQueue), new BullMQAdapter(authorsQueue)],
+  queues: [
+    new BullMQAdapter(booksQueue),
+    new BullMQAdapter(authorsQueue),
+    new BullMQAdapter(bookCoversQueue),
+  ],
   serverAdapter,
 });
 

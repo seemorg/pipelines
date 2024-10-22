@@ -1,5 +1,6 @@
+import type { _Object } from "@aws-sdk/client-s3";
 import { env } from "@/env";
-import { _Object, paginateListObjectsV2, S3 } from "@aws-sdk/client-s3";
+import { paginateListObjectsV2, S3 } from "@aws-sdk/client-s3";
 
 const s3 = new S3({
   endpoint: env.R2_ENDPOINT,
@@ -27,7 +28,7 @@ export const uploadToR2 = async (
 };
 
 export const listAllObjects = async (prefix: string) => {
-  const allObjects: Array<_Object> = [];
+  const allObjects: _Object[] = [];
 
   const paginator = paginateListObjectsV2(
     { client: s3 },

@@ -4,18 +4,18 @@ import slugify from "slugify";
 import { removeDiacritics } from "@usul/utils";
 
 import type { AuthorQueueData } from "./author-queue";
-import { AUTHORS_QUEUE_NAME, AUTHORS_QUEUE_REDIS } from "./author-queue";
 import {
   getAuthorSlugs,
   getExistingTurathAuthorIds,
   getTurathAuthorsById,
-} from "./lib/data";
-import { db } from "./lib/db";
-import { languages, languagesWithoutEnglish } from "./lib/languages";
-import { generateBiography } from "./stages/biography";
-import { localizeName } from "./stages/localization";
-import { transliterateName } from "./stages/transliteration";
-import { generateVariations } from "./stages/variations";
+} from "../../lib/data";
+import { db } from "../../lib/db";
+import { languages, languagesWithoutEnglish } from "../../lib/languages";
+import { generateBiography } from "../../stages/biography";
+import { localizeName } from "../../stages/localization";
+import { transliterateName } from "../../stages/transliteration";
+import { generateVariations } from "../../stages/variations";
+import { AUTHORS_QUEUE_NAME, AUTHORS_QUEUE_REDIS } from "./author-queue";
 
 export const worker = new Worker<AuthorQueueData>(
   AUTHORS_QUEUE_NAME,
