@@ -64,6 +64,10 @@ export const languagesWithoutArabic = languages.filter(
   (language) => language.code !== "ar",
 );
 
+export const languagesWithoutEnglishAndArabic = languages.filter(
+  (language) => language.code !== "ar" && language.code !== "en",
+);
+
 export const getLanguageByCode = (code: string) => {
   return languages.find((language) => language.code === code);
 };

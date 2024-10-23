@@ -8,12 +8,12 @@ import routes from "./routes";
 import "./queues/book/book-worker";
 import "./queues/author/author-worker";
 import "./queues/book-cover/book-cover-worker";
+import "./queues/regeneration/regeneration-worker";
 
 const app = new Hono();
 
 app.use(
   secureHeaders({
-    // crossOriginOpenerPolicy: "same-origin",
     crossOriginResourcePolicy: "cross-origin",
   }),
 );

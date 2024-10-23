@@ -10,7 +10,10 @@ import {
   getTurathBooksById,
 } from "../../lib/data";
 import { db } from "../../lib/db";
-import { languagesWithoutEnglish } from "../../lib/languages";
+import {
+  languagesWithoutEnglish,
+  languagesWithoutEnglishAndArabic,
+} from "../../lib/languages";
 import { generateBookCoverAndUploadToR2 } from "../../stages/book-covers/generate";
 import { localizeName } from "../../stages/localization";
 import { transliterateName } from "../../stages/transliteration";
@@ -91,7 +94,7 @@ export const worker = new Worker<BookQueueData>(
     // 3. localize name in other languages
     const localizedNames = (
       await Promise.all(
-        languagesWithoutEnglish.map(async (language) => {
+        languagesWithoutEnglishAndArabic.map(async (language) => {
           return {
             locale: language.code,
             text: await localizeName(

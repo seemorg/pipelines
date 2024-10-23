@@ -1,6 +1,7 @@
 import { authorsQueue } from "@/queues/author/author-queue";
 import { bookCoversQueue } from "@/queues/book-cover/book-cover-queue";
 import { booksQueue } from "@/queues/book/book-queue";
+import { regenerationQueue } from "@/queues/regeneration/regeneration-queue";
 import { createBullBoard } from "@bull-board/api";
 import { BullMQAdapter } from "@bull-board/api/dist/src/queueAdapters/bullMQ.js";
 import { HonoAdapter } from "@bull-board/hono";
@@ -27,6 +28,7 @@ createBullBoard({
     new BullMQAdapter(booksQueue),
     new BullMQAdapter(authorsQueue),
     new BullMQAdapter(bookCoversQueue),
+    new BullMQAdapter(regenerationQueue),
   ],
   serverAdapter,
 });
