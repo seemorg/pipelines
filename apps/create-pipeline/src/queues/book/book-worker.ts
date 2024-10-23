@@ -146,6 +146,9 @@ export const worker = new Worker<BookQueueData>(
       await db.book.update({
         where: { id: book.id },
         data: {
+          ...(finalData.cover && {
+            coverImageUrl: finalData.cover,
+          }),
           primaryNameTranslations: {
             upsert: finalData.primaryNames.map((name) => ({
               where: {
