@@ -1,6 +1,8 @@
 import { generateBookCoverAndUploadToR2 } from "@/stages/book-covers/generate";
 import { Worker } from "bullmq";
 
+import { chunk } from "@usul/utils";
+
 import type { RegenerationQueueData } from "./regeneration-queue";
 import { db } from "../../lib/db";
 import { languagesWithoutArabic } from "../../lib/languages";
@@ -9,6 +11,7 @@ import { localizeName } from "../../stages/localization";
 import {
   REGENERATION_QUEUE_NAME,
   REGENERATION_QUEUE_REDIS,
+  regenerationQueue,
 } from "./regeneration-queue";
 
 export const worker = new Worker<RegenerationQueueData>(
@@ -83,7 +86,7 @@ export const worker = new Worker<RegenerationQueueData>(
         });
 
         if (bookCoverResponse?.url) {
-          bookCover = bookCoverResponse?.url;
+          bookCover = bookCoverResponse.url;
         }
       }
 
@@ -132,7 +135,7 @@ export const worker = new Worker<RegenerationQueueData>(
       throw new Error(`Author with id ${data.id} not found`);
     }
 
-    let authorArabicName = author.primaryNameTranslations.find(
+    const authorArabicName = author.primaryNameTranslations.find(
       (name) => name.locale === "ar",
     )?.text;
     let authorEnglishName = author.primaryNameTranslations.find(
@@ -223,6 +226,27 @@ export const worker = new Worker<RegenerationQueueData>(
           }),
         },
       });
+
+      // if name is updated, regenerate all book covers for this author
+      if (localizedNames) {
+        const books = await db.book.findMany({
+          where: {
+            author: { id: author.id },
+          },
+        });
+        const bookIdBatches = chunk(
+          books.map((book) => book.id),
+          10,
+        );
+        for (const bookIds of bookIdBatches) {
+          await regenerationQueue.addBulk(
+            bookIds.map((bookId) => ({
+              name: `regenerate_book_${bookId}`,
+              data: { type: "book", id: bookId, regenerateCover: true },
+            })),
+          );
+        }
+      }
     }
 
     return { success: true };

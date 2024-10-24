@@ -1,5 +1,4 @@
 import { authorsQueue } from "@/queues/author/author-queue";
-import { bookCoversQueue } from "@/queues/book-cover/book-cover-queue";
 import { booksQueue } from "@/queues/book/book-queue";
 import { regenerationQueue } from "@/queues/regeneration/regeneration-queue";
 import { createBullBoard } from "@bull-board/api";
@@ -27,7 +26,6 @@ createBullBoard({
   queues: [
     new BullMQAdapter(booksQueue),
     new BullMQAdapter(authorsQueue),
-    new BullMQAdapter(bookCoversQueue),
     new BullMQAdapter(regenerationQueue),
   ],
   serverAdapter,
