@@ -5,13 +5,13 @@ import { secureHeaders } from "hono/secure-headers";
 
 import routes from "./routes";
 
-import "./book-worker";
+import "./queues/ai-indexer/worker";
+import "./queues/keyword-indexer/worker";
 
 const app = new Hono();
 
 app.use(
   secureHeaders({
-    // crossOriginOpenerPolicy: "same-origin",
     crossOriginResourcePolicy: "cross-origin",
   }),
 );

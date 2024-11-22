@@ -1,0 +1,78 @@
+import type { ContentItem } from "@openiti/markdown-parser";
+import { parseMarkdown } from "@openiti/markdown-parser";
+
+const prepareContent = (content: ContentItem[]): ContentItem[] => {
+  const newItems: ContentItem[] = [];
+
+  for (const item of content) {
+    if (item.blocks.length === 0) {
+      continue;
+    }
+
+    newItems.push(item);
+  }
+
+  return newItems;
+};
+
+export const fetchOpenitiBook = async ({
+  authorId,
+  bookId,
+  versionId,
+}: {
+  authorId: string;
+  bookId: string;
+  versionId: string;
+}) => {
+  const baseUrl = `https://raw.githubusercontent.com/OpenITI/RELEASE/2385733573ab800b5aea09bc846b1d864f475476/data/${authorId}/${bookId}/${versionId}`;
+  let finalUrl = baseUrl;
+
+  const options: RequestInit = {};
+  let response = await fetch(baseUrl, options);
+
+  if (!response.ok || response.status >= 300) {
+    finalUrl = `${baseUrl}.completed`;
+    response = await fetch(finalUrl, options);
+
+    if (!response.ok || response.status >= 300) {
+      finalUrl = `${baseUrl}.mARkdown`;
+      response = await fetch(finalUrl, options);
+
+      if (!response.ok || response.status >= 300) {
+        throw new Error("Book not found");
+      }
+    }
+  }
+
+  const text = await response.text();
+  const final = parseMarkdown(text);
+
+  // filter out empty blocks
+  final.content = prepareContent(final.content);
+
+  const volAndPageToIndex = final.content.reduce(
+    (acc, cur, idx) => {
+      acc[`${cur.volume ?? ""}-${cur.page}`] = idx;
+      return acc;
+    },
+    {} as Record<string, number>,
+  );
+
+  final.chapters = final.chapters.map((chapter) => {
+    if (chapter.page) {
+      (chapter as any).pageIndex =
+        volAndPageToIndex[`${chapter.volume ?? ""}-${chapter.page}`] ?? -1;
+    }
+    return chapter;
+  });
+
+  return {
+    ...final,
+    rawUrl: finalUrl,
+  };
+};
+
+export type OpenitiBookResponse = {
+  source: "openiti";
+  versionId: string;
+} & Awaited<ReturnType<typeof fetchOpenitiBook>>;

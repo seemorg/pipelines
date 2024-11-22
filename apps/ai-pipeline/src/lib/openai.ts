@@ -1,31 +1,9 @@
 import { env } from "@/env";
-import { OpenAI, OpenAIEmbedding } from "llamaindex";
+import { AzureOpenAI } from "openai";
 
-export const createAzureOpenAI = ({
-  temperature = 0,
-  ...config
-}: Partial<OpenAI> = {}) =>
-  new OpenAI({
-    azure: {
-      apiKey: env.AZURE_OPENAI_KEY,
-      endpoint: `https://${env.AZURE_OPENAI_RESOURCE_NAME}.openai.azure.com`,
-      deploymentName: env.AZURE_LLM_DEPLOYMENT_NAME,
-      // apiVersion: '2024-05-13',
-    },
-    temperature,
-    ...config,
-  });
-
-export const createAzureOpenAIEmbeddings = (
-  config: Partial<OpenAIEmbedding> = {},
-) =>
-  new OpenAIEmbedding({
-    azure: {
-      apiKey: env.AZURE_OPENAI_KEY,
-      endpoint: `https://${env.AZURE_OPENAI_RESOURCE_NAME}.openai.azure.com`,
-      deploymentName: env.AZURE_EMBEDDINGS_DEPLOYMENT_NAME,
-      // apiVersion: '1',
-    },
-    dimensions: 3072,
-    ...config,
-  });
+export const embeddings = new AzureOpenAI({
+  apiKey: env.AZURE_OPENAI_KEY,
+  endpoint: `https://${env.AZURE_OPENAI_RESOURCE_NAME}.openai.azure.com`,
+  deployment: env.AZURE_EMBEDDINGS_DEPLOYMENT_NAME,
+  apiVersion: "2024-10-21",
+}).embeddings;

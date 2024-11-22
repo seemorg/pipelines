@@ -14,18 +14,18 @@
     "with-env": "dotenv -e ../../.env --"
   },
   "dependencies": {
+    "@azure/search-documents": "^12.1.0",
     "@bull-board/api": "^5.21.1",
     "@bull-board/hono": "^5.21.1",
     "@hono/node-server": "^1.12.0",
     "@openiti/markdown-parser": "^1.2.2",
-    "@qdrant/js-client-rest": "^1.10.0",
     "@t3-oss/env-core": "^0.10.1",
     "@usul/db": "workspace:*",
     "@usul/utils": "workspace:*",
     "bullmq": "^5.10.3",
     "hono": "^4.5.1",
     "ioredis": "^5.4.1",
-    "llamaindex": "^0.3.17",
+    "llamaindex": "^0.8.19",
     "slugify": "^1.6.6",
     "string-strip-html": "^13.4.8",
     "zod": "catalog:"
