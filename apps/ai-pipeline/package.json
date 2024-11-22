@@ -4,8 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "pnpm with-env node dist/index.js",
-    "dev": "pnpm with-env tsup-node --watch --onSuccess \"node dist/index.js\"",
+    "start": "pnpm with-env node dist/src/index.js",
+    "dev": "pnpm with-env tsup-node --watch --onSuccess \"node dist/src/index.js\"",
     "build": "pnpm with-env tsup-node",
     "clean": "rm -rf .turbo node_modules",
     "lint": "eslint",
