@@ -5,8 +5,9 @@ import { serveStatic } from "@hono/node-server/serve-static";
 import { Hono } from "hono";
 import { basicAuth } from "hono/basic-auth";
 
-import { booksQueue } from "../book-queue";
 import { env } from "../env";
+import { booksQueue } from "../queues/ai-indexer/queue";
+import { keywordIndexerQueue } from "../queues/keyword-indexer/queue";
 
 const basePath = "/ui";
 const uiRoutes = new Hono().basePath(basePath);
@@ -21,7 +22,10 @@ uiRoutes.use(
 const serverAdapter = new HonoAdapter(serveStatic).setBasePath(basePath);
 
 createBullBoard({
-  queues: [new BullMQAdapter(booksQueue)],
+  queues: [
+    new BullMQAdapter(booksQueue),
+    new BullMQAdapter(keywordIndexerQueue),
+  ],
   serverAdapter,
 });
 
