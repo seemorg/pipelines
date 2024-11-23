@@ -2,8 +2,9 @@ import { fetchBookContent } from "@/book-fetchers";
 import { BookChunk, vectorSearchClient } from "@/lib/azure/vector-search.index";
 import { db } from "@/lib/db";
 import { embeddings } from "@/lib/openai";
-import { chunk } from "@/lib/utils";
 import { Document, Metadata, TextNode } from "llamaindex";
+
+import { chunk } from "@usul/utils";
 
 import { attachMetadataToNodes, preparePages } from "./metadata";
 import { splitter } from "./splitter";
