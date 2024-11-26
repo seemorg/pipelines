@@ -1,8 +1,10 @@
+import type { BookChunk } from "@/lib/azure/vector-search.index";
+import type { Metadata, TextNode } from "llamaindex";
 import { fetchBookContent } from "@/book-fetchers";
-import { BookChunk, vectorSearchClient } from "@/lib/azure/vector-search.index";
+import { vectorSearchClient } from "@/lib/azure/vector-search.index";
 import { db } from "@/lib/db";
 import { embeddings } from "@/lib/openai";
-import { Document, Metadata, TextNode } from "llamaindex";
+import { Document } from "llamaindex";
 
 import { chunk } from "@usul/utils";
 
@@ -72,7 +74,7 @@ export async function indexBook(
   const bookContent = await fetchBookContent(
     {
       id: book.id,
-      author: { id: book.author!.id },
+      author: { id: book.author.id },
       versions: book.versions,
     },
     versionToIndex.value,
@@ -115,6 +117,7 @@ export async function indexBook(
   let chapterIdx = 1;
   for (const chapterPages of pagesByChapter) {
     console.log(`splitting chapter ${chapterIdx++} / ${pagesByChapter.length}`);
+    if (chapterPages.length === 0) continue;
 
     const concatenatedContent = chapterPages
       .map((p) => p.text)
