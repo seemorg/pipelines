@@ -1,8 +1,8 @@
-import { indexAuthors } from "src/typesense/index-authors";
-import { indexBooks } from "src/typesense/index-books";
-import { indexTypesenseGenres } from "src/typesense/index-genres";
-import { indexTypesenseRegions } from "src/typesense/index-regions";
-import { indexTypesenseSearch } from "src/typesense/index-search";
+import { indexAuthors } from "@/typesense/index-authors";
+import { indexBooks } from "@/typesense/index-books";
+import { indexTypesenseGenres } from "@/typesense/index-genres";
+import { indexTypesenseRegions } from "@/typesense/index-regions";
+import { indexTypesenseSearch } from "@/typesense/index-search";
 
 export const reIndexTypesense = async () => {
   // Index everything

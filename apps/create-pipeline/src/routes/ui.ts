@@ -1,6 +1,7 @@
 import { authorsQueue } from "@/queues/author/author-queue";
 import { booksQueue } from "@/queues/book/book-queue";
 import { regenerationQueue } from "@/queues/regeneration/regeneration-queue";
+import { typesenseQueue } from "@/queues/typesense/typesense-queue";
 import { createBullBoard } from "@bull-board/api";
 import { BullMQAdapter } from "@bull-board/api/dist/src/queueAdapters/bullMQ.js";
 import { HonoAdapter } from "@bull-board/hono";
@@ -27,6 +28,7 @@ createBullBoard({
     new BullMQAdapter(booksQueue),
     new BullMQAdapter(authorsQueue),
     new BullMQAdapter(regenerationQueue),
+    new BullMQAdapter(typesenseQueue),
   ],
   serverAdapter,
 });
