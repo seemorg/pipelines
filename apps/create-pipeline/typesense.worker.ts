@@ -4,7 +4,7 @@ import { indexTypesenseGenres } from "@/typesense/index-genres";
 import { indexTypesenseRegions } from "@/typesense/index-regions";
 import { indexTypesenseSearch } from "@/typesense/index-search";
 
-export const reIndexTypesense = async () => {
+const reIndexTypesense = async () => {
   // Index everything
   await indexAuthors();
   await indexBooks();
@@ -17,3 +17,5 @@ export const reIndexTypesense = async () => {
     completedAt: Date.now(),
   };
 };
+
+export default reIndexTypesense;
