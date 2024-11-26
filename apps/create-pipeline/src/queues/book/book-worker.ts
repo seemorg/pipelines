@@ -10,10 +10,7 @@ import {
   getTurathBooksById,
 } from "../../lib/data";
 import { db } from "../../lib/db";
-import {
-  languagesWithoutEnglish,
-  languagesWithoutEnglishAndArabic,
-} from "../../lib/languages";
+import { languagesWithoutEnglishAndArabic } from "../../lib/languages";
 import { generateBookCoverAndUploadToR2 } from "../../stages/book-covers/generate";
 import { localizeName } from "../../stages/localization";
 import { transliterateName } from "../../stages/transliteration";

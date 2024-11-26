@@ -96,7 +96,7 @@ export interface TypesenseBook {
   }[];
   _nameVariations: string[];
   _popularity: number;
-  year: number;
+  year?: number;
   geographies: string[];
   regions: string[];
   genreIds: string[];
@@ -105,7 +105,7 @@ export interface TypesenseBook {
     id: string;
     slug: string;
     transliteration?: string;
-    year: number;
+    year?: number;
     primaryNames: {
       text: string;
       locale: string;

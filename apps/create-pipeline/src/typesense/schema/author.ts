@@ -29,6 +29,7 @@ export const TYPESENSE_AUTHOR_SCHEMA = (
       name: "year",
       type: "int32",
       facet: true,
+      optional: true,
     },
     {
       name: "primaryNames",
@@ -76,7 +77,7 @@ export interface AuthorDocument {
   id: string;
   slug: string;
   transliteration?: string;
-  year: number;
+  year?: number;
   primaryNames: {
     locale: string;
     text: string;
@@ -130,7 +131,7 @@ export const prepareTypesenseAuthorsData = async () => {
     return {
       id: author.id,
       slug: author.slug,
-      year: author.year,
+      year: author.year ? author.year : undefined,
       transliteration: author.transliteration ?? undefined,
       primaryNames: author.primaryNameTranslations,
       otherNames: author.otherNameTranslations,
