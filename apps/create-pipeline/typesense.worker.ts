@@ -1,11 +1,11 @@
 import type { TypesenseQueueData } from "@/queues/typesense/typesense-queue";
 import type { SandboxedJob } from "bullmq";
+import type ImportError from "typesense/lib/Typesense/Errors/ImportError.js";
 import { indexAuthors } from "@/typesense/index-authors";
 import { indexBooks } from "@/typesense/index-books";
 import { indexTypesenseGenres } from "@/typesense/index-genres";
 import { indexTypesenseRegions } from "@/typesense/index-regions";
 import { indexTypesenseSearch } from "@/typesense/index-search";
-import ImportError from "typesense/lib/Typesense/Errors/ImportError.js";
 
 export default async function typesenseWorker(
   job: SandboxedJob<TypesenseQueueData>,
@@ -26,12 +26,12 @@ export default async function typesenseWorker(
 
     await indexTypesenseSearch();
     await job.updateProgress(100);
-  } catch (e) {
-    if (e instanceof ImportError) {
+  } catch (e: any) {
+    if ("importResults" in e) {
       throw new Error(
         JSON.stringify({
-          importResults: e.importResults,
-          cause: e.cause,
+          importResults: (e as ImportError).importResults,
+          cause: (e as ImportError).cause,
         }),
       );
     }
