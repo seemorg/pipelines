@@ -8,6 +8,7 @@ import routes from "./routes";
 import "./queues/book/book-worker";
 import "./queues/author/author-worker";
 import "./queues/regeneration/regeneration-worker";
+import "./queues/typesense/typesense-worker";
 
 const app = new Hono();
 

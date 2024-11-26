@@ -1,4 +1,4 @@
-import { CollectionCreateSchema } from "typesense/lib/Typesense/Collections";
+import type { CollectionCreateSchema } from "typesense/lib/Typesense/Collections";
 
 import { dedupeStrings, getNamesVariations } from "@usul/utils";
 
@@ -231,9 +231,7 @@ export const prepareTypesenseSearchDocuments = async () => {
       });
     }
 
-    if (iterationDocuments) {
-      documents.push(...iterationDocuments);
-    }
+    documents.push(...iterationDocuments);
   }
 
   return documents;

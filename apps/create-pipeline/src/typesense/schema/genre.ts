@@ -1,5 +1,5 @@
+import type { CollectionCreateSchema } from "typesense/lib/Typesense/Collections";
 import { db } from "@/lib/db";
-import { CollectionCreateSchema } from "typesense/lib/Typesense/Collections";
 
 export const COLLECTION_NAME = "genres";
 export const BATCH_SIZE = 50;
@@ -38,7 +38,7 @@ export const TYPESENSE_GENRE_SCHEMA = (
   ],
 });
 
-export type TypesenseGenre = {
+export interface TypesenseGenre {
   id: string;
   slug: string;
   transliteration?: string | null;
@@ -48,7 +48,7 @@ export type TypesenseGenre = {
   }[];
   booksCount: number;
   _popularity: number;
-};
+}
 
 export const prepareTypesenseGenresData = async () => {
   const genres = await db.genre.findMany({

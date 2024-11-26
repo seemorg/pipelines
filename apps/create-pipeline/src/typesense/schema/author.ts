@@ -1,5 +1,5 @@
+import type { CollectionCreateSchema } from "typesense/lib/Typesense/Collections";
 import { db } from "@/lib/db";
-import { CollectionCreateSchema } from "typesense/lib/Typesense/Collections";
 
 import { dedupeStrings, getNamesVariations } from "@usul/utils";
 

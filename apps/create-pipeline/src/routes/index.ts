@@ -2,6 +2,8 @@ import { Hono } from "hono";
 
 import authorsRoutes from "./authors";
 import booksRoutes from "./books";
+import cacheRoutes from "./cache";
+import typesenseRoutes from "./typesense";
 import uiRoutes from "./ui";
 import uptimeRoutes from "./uptime";
 
@@ -11,5 +13,7 @@ routes.route("/", uptimeRoutes);
 routes.route("/", uiRoutes);
 routes.route("/", authorsRoutes);
 routes.route("/", booksRoutes);
+routes.route("/", typesenseRoutes);
+routes.route("/", cacheRoutes);
 
 export default routes;
