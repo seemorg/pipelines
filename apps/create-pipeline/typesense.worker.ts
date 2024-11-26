@@ -5,7 +5,7 @@ import { indexBooks } from "@/typesense/index-books";
 import { indexTypesenseGenres } from "@/typesense/index-genres";
 import { indexTypesenseRegions } from "@/typesense/index-regions";
 import { indexTypesenseSearch } from "@/typesense/index-search";
-import { ImportError } from "typesense/lib/Typesense/Errors";
+import ImportError from "typesense/lib/Typesense/Errors/ImportError.js";
 
 export default async function typesenseWorker(
   job: SandboxedJob<TypesenseQueueData>,
