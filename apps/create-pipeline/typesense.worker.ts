@@ -1,6 +1,7 @@
 import type { TypesenseQueueData } from "@/queues/typesense/typesense-queue";
 import type { SandboxedJob } from "bullmq";
 import type ImportError from "typesense/lib/Typesense/Errors/ImportError.js";
+import { purgeAllCloudflareCache } from "@/lib/cloudflare";
 import { indexAuthors } from "@/typesense/index-authors";
 import { indexBooks } from "@/typesense/index-books";
 import { indexTypesenseGenres } from "@/typesense/index-genres";
@@ -38,6 +39,10 @@ export default async function typesenseWorker(
     }
 
     throw e;
+  }
+
+  if (job.data.clearCloudflareCache) {
+    await purgeAllCloudflareCache();
   }
 
   return {

@@ -1,6 +1,8 @@
 import { typesenseQueue } from "@/queues/typesense/typesense-queue";
+import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { bearerAuth } from "hono/bearer-auth";
+import { z } from "zod";
 
 import { env } from "../env";
 
@@ -13,31 +15,43 @@ typesenseRoutes.use(
   }),
 );
 
-typesenseRoutes.post("/index", async (c) => {
-  // Check if there's already an active job
-  const activeJobs = await typesenseQueue.getActive();
-  const waitingJobs = await typesenseQueue.getWaiting();
+typesenseRoutes.post(
+  "/index",
+  zValidator(
+    "json",
+    z.object({
+      clearCloudflareCache: z.boolean().optional(),
+    }),
+  ),
+  async (c) => {
+    // Check if there's already an active job
+    const activeJobs = await typesenseQueue.getActive();
+    const waitingJobs = await typesenseQueue.getWaiting();
 
-  if (activeJobs.length > 0 || waitingJobs.length > 0) {
-    return c.json(
-      {
-        status: "IN_PROGRESS",
-        error: "A re-index operation is already in progress",
-      },
-      409,
-    );
-  }
+    if (activeJobs.length > 0 || waitingJobs.length > 0) {
+      return c.json(
+        {
+          status: "IN_PROGRESS",
+          error: "A re-index operation is already in progress",
+        },
+        409,
+      );
+    }
 
-  const requestedAt = Date.now();
-  await typesenseQueue.add("re-index", {
-    requestedAt,
-  });
+    const requestedAt = Date.now();
+    const { clearCloudflareCache } = c.req.valid("json");
 
-  return c.json({
-    status: "STARTED",
-    requestedAt,
-  });
-});
+    await typesenseQueue.add("re-index", {
+      requestedAt,
+      clearCloudflareCache,
+    });
+
+    return c.json({
+      status: "STARTED",
+      requestedAt,
+    });
+  },
+);
 
 typesenseRoutes.get("/status", async (c) => {
   const activeJobs = await typesenseQueue.getActive();

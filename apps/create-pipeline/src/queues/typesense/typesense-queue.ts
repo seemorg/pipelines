@@ -7,6 +7,7 @@ export const TYPESENSE_QUEUE_REDIS = createRedis();
 
 export interface TypesenseQueueData {
   requestedAt: number;
+  clearCloudflareCache?: boolean;
 }
 
 export const typesenseQueue = new Queue<TypesenseQueueData>(
