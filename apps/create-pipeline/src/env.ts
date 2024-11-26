@@ -20,6 +20,8 @@ export const env = createEnv({
     R2_ENDPOINT: z.string().min(1),
     R2_BUCKET: z.string().min(1),
     USUL_PIPELINE_API_KEY: z.string().min(1),
+    TYPESENSE_URL: z.string().min(1),
+    TYPESENSE_API_KEY: z.string().min(1),
     // CF_ZONE_ID: z.string().min(1),
     // CF_TOKEN: z.string().min(1),
   },

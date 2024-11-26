@@ -38,17 +38,19 @@ authorsRoutes.post(
     "json",
     z.object({
       id: z.string(),
-      regenerateBio: z.boolean().optional(),
       regenerateNames: z.boolean().optional(),
+      bioEn: z.string().optional(),
+      bioAr: z.string().optional(),
     }),
   ),
   async (c) => {
-    const { id, regenerateBio, regenerateNames } = c.req.valid("json");
+    const { id, regenerateNames, bioAr, bioEn } = c.req.valid("json");
     await regenerationQueue.add(`regenerate_author_${id}`, {
       type: "author",
       id,
-      regenerateBio,
       regenerateNames,
+      bioAr,
+      bioEn,
     });
 
     return c.json({ success: true });

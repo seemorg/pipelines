@@ -32,6 +32,7 @@
     "puppeteer-core": "^22.4.0",
     "slugify": "^1.6.6",
     "string-strip-html": "^13.4.8",
+    "typesense": "^1.8.2",
     "zod": "catalog:"
   },
   "devDependencies": {

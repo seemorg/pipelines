@@ -67,3 +67,48 @@ export const generateBiography = async (
 
   return parsedResult.data.bio;
 };
+
+const TRANSLATE_SYSTEM_PROMPT = (sourceLocale: string, targetLocale: string) =>
+  `
+You are an assistant that takes a biography written in ${sourceLocale} and translates it into ${targetLocale}.
+
+Sample Output:
+{
+  "bio": "...",
+}
+`.trim();
+
+const translateSchema = z.object({
+  bio: z.string(),
+});
+
+export const translateBiography = async (
+  { text, locale: sourceLocale }: { text: string; locale: "ar" | "en" },
+  locale: string,
+): Promise<string | null> => {
+  const language = getLanguageByCode(locale);
+  if (!language) return null;
+
+  const completion = await openai.chat.completions.create({
+    model: "",
+    response_format: { type: "json_object" },
+    messages: [
+      {
+        role: "system",
+        content: TRANSLATE_SYSTEM_PROMPT(sourceLocale, language.name),
+      },
+      {
+        role: "user",
+        content: text,
+      },
+    ],
+  });
+
+  const result = completion.choices[0]?.message.content;
+  if (!result) return null;
+
+  const parsedResult = translateSchema.safeParse(JSON.parse(result));
+  if (!parsedResult.success) return null;
+
+  return parsedResult.data.bio;
+};

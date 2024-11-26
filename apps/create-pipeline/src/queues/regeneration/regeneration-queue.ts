@@ -16,7 +16,8 @@ export type RegenerationQueueData =
       type: "author";
       id: string;
       regenerateNames?: boolean;
-      regenerateBio?: boolean;
+      bioEn?: string;
+      bioAr?: string;
     };
 
 export const regenerationQueue = new Queue<RegenerationQueueData>(

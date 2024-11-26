@@ -5,8 +5,11 @@ import { chunk } from "@usul/utils";
 
 import type { RegenerationQueueData } from "./regeneration-queue";
 import { db } from "../../lib/db";
-import { languagesWithoutArabic } from "../../lib/languages";
-import { generateBiography } from "../../stages/biography";
+import {
+  languagesWithoutArabic,
+  languagesWithoutEnglish,
+} from "../../lib/languages";
+import { translateBiography } from "../../stages/biography";
 import { localizeName } from "../../stages/localization";
 import {
   REGENERATION_QUEUE_NAME,
@@ -174,23 +177,26 @@ export const worker = new Worker<RegenerationQueueData>(
     }
 
     let bios: { locale: string; text: string }[] | null = null;
-    if (data.regenerateBio || data.regenerateNames) {
-      // 6. generate bios
+    if (data.bioAr || data.bioEn) {
+      // 6. translate bios
       bios = (
         await Promise.all(
-          languagesWithoutArabic.map(async (language) => {
-            return {
-              locale: language.code,
-              text: await generateBiography(
+          (data.bioAr ? languagesWithoutArabic : languagesWithoutEnglish).map(
+            async (language) => {
+              const text = await translateBiography(
                 {
-                  primaryArabicName: authorArabicName,
-                  primaryLatinName: authorEnglishName,
+                  text: (data.bioAr || data.bioEn)!,
+                  locale: data.bioAr ? "ar" : "en",
                 },
-
                 language.code,
-              ),
-            };
-          }),
+              );
+
+              return {
+                locale: language.code,
+                text,
+              };
+            },
+          ),
         )
       ).filter(
         (name): name is { locale: string; text: string } => name.text !== null,
