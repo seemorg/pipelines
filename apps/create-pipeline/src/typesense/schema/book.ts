@@ -164,7 +164,10 @@ export const prepareTypesenseBooksData = async () => {
       slug: book.slug,
       transliteration: book.transliteration ?? undefined,
       primaryNames: book.primaryNameTranslations,
-      otherNames: book.otherNameTranslations,
+      otherNames:
+        book.otherNameTranslations.length === 0
+          ? [{ texts: [], locale: "en" }]
+          : book.otherNameTranslations,
       genreIds: book.genres.map((genre) => genre.id),
       versions: book.versions,
       year: author.year,

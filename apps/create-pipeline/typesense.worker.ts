@@ -32,6 +32,7 @@ export default async function typesenseWorker(
         JSON.stringify({
           importResults: (e as ImportError).importResults,
           cause: (e as ImportError).cause,
+          message: (e as ImportError).message,
         }),
       );
     }

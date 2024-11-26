@@ -134,7 +134,10 @@ export const prepareTypesenseAuthorsData = async () => {
       year: author.year ? author.year : undefined,
       transliteration: author.transliteration ?? undefined,
       primaryNames: author.primaryNameTranslations,
-      otherNames: author.otherNameTranslations,
+      otherNames:
+        author.otherNameTranslations.length === 0
+          ? [{ texts: [], locale: "en" }]
+          : author.otherNameTranslations,
       geographies: dedupeStrings(author.locations.map((l) => l.id)),
       regions: dedupeStrings(
         author.locations.map((l) => l.regionId).filter(Boolean) as string[],
