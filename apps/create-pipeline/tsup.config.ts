@@ -8,7 +8,5 @@ export default defineConfig((options: Options) => ({
   platform: "node",
   target: "node20",
   sourcemap: true,
-  // transpile @usul-ocr/db
-  // external: ['@usul-ocr/db'],
   ...options,
 }));

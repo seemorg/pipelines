@@ -52,6 +52,7 @@ export const TYPESENSE_BOOK_SCHEMA = (
       name: "year",
       type: "int32",
       facet: true,
+      optional: true,
     },
     {
       name: "geographies",

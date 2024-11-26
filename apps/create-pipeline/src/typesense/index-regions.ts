@@ -35,14 +35,8 @@ export const indexTypesenseRegions = async () => {
   let i = 1;
   for (const batch of batches) {
     console.log(`Indexing batch ${i} / ${batches.length}`);
-    const responses = await client
-      .collections(INDEX_NAME)
-      .documents()
-      .import(batch);
+    await client.collections(INDEX_NAME).documents().import(batch);
 
-    if (responses.some((r) => r.success === false)) {
-      throw new Error(`Failed to index some ${COLLECTION_NAME} on this batch`);
-    }
     i++;
   }
 

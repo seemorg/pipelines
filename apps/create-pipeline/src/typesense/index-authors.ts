@@ -31,20 +31,12 @@ export const indexAuthors = async () => {
 
   const batches = chunk(documents, BATCH_SIZE);
 
-  // const foundVariations: object[] = [];
-
   let i = 1;
   for (const batch of batches) {
     console.log(`Indexing batch ${i} / ${batches.length}`);
 
-    const responses = await client
-      .collections(INDEX_NAME)
-      .documents()
-      .import(batch);
+    await client.collections(INDEX_NAME).documents().import(batch);
 
-    if (responses.some((r) => r.success === false)) {
-      throw new Error("Failed to index some authors on this batch");
-    }
     i++;
   }
   console.log(`Indexed ${documents.length} authors`);
