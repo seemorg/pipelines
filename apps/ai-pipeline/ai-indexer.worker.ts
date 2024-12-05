@@ -1,12 +1,12 @@
+import type { BookQueueData } from "@/queues/ai-indexer/queue";
+import type { SandboxedJob } from "bullmq";
 import { indexBook } from "@/indexer/v1";
 import { db } from "@/lib/db";
-import { BookQueueData } from "@/queues/ai-indexer/queue";
-import { SandboxedJob } from "bullmq";
 
 const updateBookFlags = async (id: string, versionId: string) => {
   const book = await db.book.findUnique({
     where: { id },
-    select: { id: true, flags: true, versions: true },
+    select: { id: true, versions: true },
   });
 
   if (!book) {
@@ -19,11 +19,10 @@ const updateBookFlags = async (id: string, versionId: string) => {
       id: book.id,
     },
     data: {
-      flags: {
-        ...book.flags,
-        aiSupported: true,
-        aiVersion: versionId,
-      } as PrismaJson.BookFlags,
+      versions: book.versions.map((v) => ({
+        ...v,
+        ...(v.value === versionId ? { aiSupported: true } : {}),
+      })),
     },
   });
 };

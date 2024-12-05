@@ -5,7 +5,6 @@ let books:
       id: string;
       slug: string;
       versions: PrismaJson.BookVersion[];
-      flags: PrismaJson.BookFlags;
     }[]
   | undefined;
 export const getBooksData = async () => {
@@ -16,7 +15,6 @@ export const getBooksData = async () => {
       id: true,
       slug: true,
       versions: true,
-      flags: true,
     },
   });
 

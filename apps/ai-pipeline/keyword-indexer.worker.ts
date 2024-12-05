@@ -1,9 +1,9 @@
+import type { KeywordIndexerQueueData } from "@/queues/keyword-indexer/queue";
+import type { SandboxedJob } from "bullmq";
 import { fetchBookContent } from "@/book-fetchers";
 import { preparePages } from "@/indexer/v1/metadata";
 import { keywordSearchClient } from "@/lib/azure/keyword-search.index";
 import { db } from "@/lib/db";
-import { KeywordIndexerQueueData } from "@/queues/keyword-indexer/queue";
-import { SandboxedJob } from "bullmq";
 
 import { chunk } from "@usul/utils";
 
@@ -20,7 +20,7 @@ const makeId = (
 const updateBookFlags = async (id: string, versionId: string) => {
   const book = await db.book.findUnique({
     where: { id },
-    select: { id: true, flags: true, versions: true },
+    select: { id: true, versions: true },
   });
 
   if (!book) {
@@ -33,11 +33,10 @@ const updateBookFlags = async (id: string, versionId: string) => {
       id: book.id,
     },
     data: {
-      flags: {
-        ...book.flags,
-        keywordSupported: true,
-        keywordVersion: versionId,
-      } as PrismaJson.BookFlags,
+      versions: book.versions.map((v) => ({
+        ...v,
+        ...(v.value === versionId ? { keywordSupported: true } : {}),
+      })),
     },
   });
 };
