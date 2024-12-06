@@ -75,6 +75,12 @@ export const TYPESENSE_BOOK_SCHEMA = (
       index: false,
     },
     {
+      name: "coverUrl",
+      type: "string",
+      optional: true,
+      index: false,
+    },
+    {
       name: "genreIds",
       type: "string[]",
       facet: true,
@@ -102,6 +108,7 @@ export interface TypesenseBook {
   regions: string[];
   genreIds: string[];
   versions: PrismaJson.BookVersion[];
+  coverUrl?: string;
   author: {
     id: string;
     slug: string;
@@ -132,6 +139,7 @@ export const prepareTypesenseBooksData = async () => {
       slug: true,
       versions: true,
       transliteration: true,
+      coverImageUrl: true,
       primaryNameTranslations: {
         select: {
           text: true,
@@ -185,6 +193,7 @@ export const prepareTypesenseBooksData = async () => {
       geographies: author.geographies,
       regions: author.regions,
       _popularity: author._popularity,
+      coverUrl: book.coverImageUrl ?? undefined,
       _nameVariations: dedupeStrings(
         getNamesVariations([
           ...book.primaryNameTranslations.map(({ text }) => text),
