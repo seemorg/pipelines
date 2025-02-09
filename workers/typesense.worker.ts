@@ -1,4 +1,4 @@
-import type { TypesenseQueueData } from "@/queues/typesense/typesense-queue";
+import type { TypesenseQueueData } from "@/queues/typesense/queue";
 import type { SandboxedJob } from "bullmq";
 import type ImportError from "typesense/lib/Typesense/Errors/ImportError.js";
 import { purgeAllCloudflareCache } from "@/lib/cloudflare";

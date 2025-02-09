@@ -7,10 +7,10 @@ import { env } from "./env";
 import routes from "./routes";
 
 if (env.NODE_ENV === "production") {
-  await import("./queues/book/book-worker");
-  await import("./queues/author/author-worker");
-  await import("./queues/regeneration/regeneration-worker");
-  await import("./queues/typesense/typesense-worker");
+  await import("./queues/book/worker");
+  await import("./queues/author/worker");
+  await import("./queues/regeneration/worker");
+  await import("./queues/typesense/worker");
   await import("./queues/ai-indexer/worker");
   await import("./queues/keyword-indexer/worker");
 }

@@ -1,5 +1,5 @@
 import type { TurathAllDataResponse } from "@/utils";
-import { authorsQueue } from "@/queues/author/author-queue";
+import { authorsQueue } from "@/queues/author/queue";
 import { getTurathAuthors, getTurathBooks } from "@/utils";
 
 import { db } from "./db";

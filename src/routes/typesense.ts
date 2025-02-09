@@ -1,4 +1,4 @@
-import { typesenseQueue } from "@/queues/typesense/typesense-queue";
+import { typesenseQueue } from "@/queues/typesense/queue";
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { bearerAuth } from "hono/bearer-auth";
