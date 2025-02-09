@@ -1,5 +1,5 @@
-import { booksQueue } from "@/queues/book/book-queue";
-import { regenerationQueue } from "@/queues/regeneration/regeneration-queue";
+import { booksQueue } from "@/queues/book/queue";
+import { regenerationQueue } from "@/queues/regeneration/queue";
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { bearerAuth } from "hono/bearer-auth";

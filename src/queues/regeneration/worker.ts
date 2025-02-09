@@ -1,20 +1,20 @@
-import { generateBookCoverAndUploadToR2 } from "@/stages/book-covers/generate";
-import { chunk } from "@/utils";
-import { Worker } from "bullmq";
-
-import type { RegenerationQueueData } from "./regeneration-queue";
-import { db } from "../../lib/db";
+import { db } from "@/lib/db";
 import {
   languagesWithoutArabic,
   languagesWithoutEnglish,
-} from "../../lib/languages";
-import { translateBiography } from "../../stages/biography";
-import { localizeName } from "../../stages/localization";
+} from "@/lib/languages";
+import { translateBiography } from "@/stages/biography";
+import { generateBookCoverAndUploadToR2 } from "@/stages/book-covers/generate";
+import { localizeName } from "@/stages/localization";
+import { chunk } from "@/utils";
+import { Worker } from "bullmq";
+
+import type { RegenerationQueueData } from "./queue";
 import {
   REGENERATION_QUEUE_NAME,
   REGENERATION_QUEUE_REDIS,
   regenerationQueue,
-} from "./regeneration-queue";
+} from "./queue";
 
 export const worker = new Worker<RegenerationQueueData>(
   REGENERATION_QUEUE_NAME,

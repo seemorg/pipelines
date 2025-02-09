@@ -1,4 +1,4 @@
-import type { BookQueueData } from "@/queues/ai-indexer/queue";
+import type { AiIndexerQueueData } from "@/queues/ai-indexer/queue";
 import type { SandboxedJob } from "bullmq";
 import { indexBook } from "@/indexer/v1";
 import { db } from "@/lib/db";
@@ -32,7 +32,7 @@ const updateBookFlags = async (id: string, versionId: string) => {
 };
 
 export default async function aiIndexerWorker(
-  job: SandboxedJob<BookQueueData>,
+  job: SandboxedJob<AiIndexerQueueData>,
 ) {
   const { id, versionId } = job.data;
 

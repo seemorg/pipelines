@@ -6,8 +6,12 @@ import { Hono } from "hono";
 import { basicAuth } from "hono/basic-auth";
 
 import { env } from "../env";
-import { booksQueue } from "../queues/ai-indexer/queue";
+import { aiIndexerQueue } from "../queues/ai-indexer/queue";
+import { authorsQueue } from "../queues/author/queue";
+import { booksQueue } from "../queues/book/queue";
 import { keywordIndexerQueue } from "../queues/keyword-indexer/queue";
+import { regenerationQueue } from "../queues/regeneration/queue";
+import { typesenseQueue } from "../queues/typesense/queue";
 
 const basePath = "/ui";
 const uiRoutes = new Hono().basePath(basePath);
@@ -23,8 +27,12 @@ const serverAdapter = new HonoAdapter(serveStatic).setBasePath(basePath);
 
 createBullBoard({
   queues: [
-    new BullMQAdapter(booksQueue),
+    new BullMQAdapter(aiIndexerQueue),
     new BullMQAdapter(keywordIndexerQueue),
+    new BullMQAdapter(typesenseQueue),
+    new BullMQAdapter(regenerationQueue),
+    new BullMQAdapter(booksQueue),
+    new BullMQAdapter(authorsQueue),
   ],
   serverAdapter,
 });

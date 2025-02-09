@@ -1,20 +1,20 @@
-import { removeDiacritics } from "@/utils";
-import { Worker } from "bullmq";
-import slugify from "slugify";
-
-import type { BookQueueData } from "./book-queue";
 import {
   getBookSlugs,
   getTurathAuthorsById,
   getTurathBooksById,
-} from "../../lib/data";
-import { db } from "../../lib/db";
-import { languagesWithoutEnglishAndArabic } from "../../lib/languages";
-import { generateBookCoverAndUploadToR2 } from "../../stages/book-covers/generate";
-import { localizeName } from "../../stages/localization";
-import { transliterateName } from "../../stages/transliteration";
-import { generateVariations } from "../../stages/variations";
-import { BOOKS_QUEUE_NAME, BOOKS_QUEUE_REDIS } from "./book-queue";
+} from "@/lib/data";
+import { db } from "@/lib/db";
+import { languagesWithoutEnglishAndArabic } from "@/lib/languages";
+import { generateBookCoverAndUploadToR2 } from "@/stages/book-covers/generate";
+import { localizeName } from "@/stages/localization";
+import { transliterateName } from "@/stages/transliteration";
+import { generateVariations } from "@/stages/variations";
+import { removeDiacritics } from "@/utils";
+import { Worker } from "bullmq";
+import slugify from "slugify";
+
+import type { BookQueueData } from "./queue";
+import { BOOKS_QUEUE_NAME, BOOKS_QUEUE_REDIS } from "./queue";
 
 export const worker = new Worker<BookQueueData>(
   BOOKS_QUEUE_NAME,

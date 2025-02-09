@@ -1,6 +1,5 @@
+import { createRedis } from "@/lib/redis";
 import { Queue } from "bullmq";
-
-import { createRedis } from "../../lib/redis";
 
 export const AUTHORS_QUEUE_NAME = "create_pipeline_authors_queue";
 export const AUTHORS_QUEUE_REDIS = createRedis();
