@@ -28,15 +28,14 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 
 FROM base AS build
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
-RUN pnpm run build --filter create-pipeline
+
+RUN pnpm run build
 
 FROM base
 COPY --from=prod-deps /app/node_modules /app/node_modules
 
-COPY --from=build /app/apps /app/apps
-COPY --from=build /app/packages /app/packages
-COPY --from=build /app/tooling /app/tooling
+COPY --from=build /app/dist /app/dist
 
-EXPOSE 8080
+EXPOSE 3000
 
-CMD [ "pnpm", "start:create-pipeline" ]
+CMD [ "pnpm", "start" ]
