@@ -4,6 +4,7 @@ ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
 
+WORKDIR /app
 
 # RUN apt-get update -qq && \
 #     apt-get install --no-install-recommends -y build-essential libcairo2-dev libpango1.0-dev
@@ -21,16 +22,16 @@ RUN corepack enable
 
 FROM base AS builder
 
-COPY pnpm-lock.yaml /app
-WORKDIR /app
+COPY pnpm-lock.yaml .
 RUN pnpm fetch --prod
 
-COPY . /app
+COPY . .
 RUN pnpm run build
 
 FROM base AS runner
 COPY --from=builder /app/node_modules /app/node_modules
 COPY --from=builder /app/dist /app/dist
+COPY --from=builder /app/package.json /app/package.json
 
 EXPOSE ${PORT}
 
