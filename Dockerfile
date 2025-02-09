@@ -1,7 +1,15 @@
 ARG NODE_VERSION=20.16.0
-ARG PNPM_VERSION=9.15.4
 
 FROM node:${NODE_VERSION}-slim as base
+
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+
+# Set production environment
+ENV NODE_ENV "production"
+ENV PORT 3000
+
+RUN corepack enable
 
 RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y build-essential libcairo2-dev libpango1.0-dev
@@ -17,44 +25,22 @@ RUN apt-get update && apt-get install curl gnupg -y \
   && apt-get install google-chrome-stable -y --no-install-recommends \
   && rm -rf /var/lib/apt/lists/*
 
-RUN corepack enable
-
 # App lives here
+COPY . /app
 WORKDIR /app
 
-# Throw-away build stage to reduce size of final image
-FROM base as builder
+FROM base AS prod-deps
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile
 
-RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y build-essential node-gyp pkg-config python-is-python3
+FROM base AS build
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+RUN pnpm run build
 
-# Install pnpm
-RUN npm install -g pnpm@$PNPM_VERSION
-
-COPY . .
-  
-RUN pnpm install --frozen-lockfile
-
-# Set production environment
-ENV NODE_ENV "production"
-
-RUN pnpm build
-
-# Final stage for app image
 FROM base AS runner
-
-# Set production environment
-ENV NODE_ENV "production"
-ENV PORT 3000
-
-# Copy built application
-COPY --from=builder /app /app
-
-RUN rm -rf /app/src
-RUN rm -rf /app/workers
-RUN rm -rf /app/tooling
+COPY --from=prod-deps /app/node_modules /app/node_modules
+COPY --from=build /app/dist /app/dist
 
 # Start the server by default, this can be overwritten at runtime
 EXPOSE ${PORT}
 
-CMD [ "npm", "start" ]
+CMD [ "pnpm", "start" ]
