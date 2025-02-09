@@ -1,9 +1,9 @@
-ARG NODE_VERSION=20.16.0
-
+ARG NODE_VERSION=20.10.0
+ARG PNPM_VERSION=9.6.0
 FROM node:${NODE_VERSION}-slim as base
 
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
+WORKDIR /app
+
 ENV NODE_ENV="production"
 ENV PORT=3000
 RUN corepack enable
@@ -24,15 +24,17 @@ RUN apt-get update && apt-get install curl gnupg -y \
 
 FROM base AS builder
 
-COPY pnpm-lock.yaml /app
-WORKDIR /app
-RUN pnpm fetch --prod
-
-COPY . /app
+RUN npm install -g pnpm@$PNPM_VERSION
+COPY . .
+RUN pnpm install --frozen-lockfile
 RUN pnpm run build
 
 FROM base AS runner
-COPY --from=builder /app/node_modules /app/node_modules
-COPY --from=builder /app/dist /app/dist
+
+COPY --from=builder /app /app
+RUN rm -rf /app/src
+RUN rm -rf /app/workers
+
 EXPOSE ${PORT}
-CMD [ "pnpm", "start" ]
+
+CMD [ "npm", "start" ]
