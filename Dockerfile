@@ -22,10 +22,8 @@ WORKDIR /app
 
 FROM base AS builder
 
-COPY pnpm-lock.yaml .
-RUN pnpm fetch --prod
-
 COPY . .
+RUN pnpm install --frozen-lockfile
 RUN pnpm run build
 
 FROM base AS runner
