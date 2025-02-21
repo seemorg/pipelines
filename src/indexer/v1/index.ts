@@ -141,72 +141,72 @@ export async function indexBook(
     nodes.push(...chapterNodes);
   }
 
-  // const batches = chunk(nodes, 30);
-  // let i = 0;
+  const batches = chunk(nodes, 30);
+  let i = 0;
 
-  // const versionSource = versionToIndex.source;
-  // const versionValue = versionToIndex.value;
+  const versionSource = versionToIndex.source;
+  const versionValue = versionToIndex.value;
 
-  // let activeBatch = 0;
-  // for (const batch of batches) {
-  //   console.log(`Embedding batch ${++activeBatch} / ${batches.length}`);
+  let activeBatch = 0;
+  for (const batch of batches) {
+    console.log(`Embedding batch ${++activeBatch} / ${batches.length}`);
 
-  //   // we first embed
-  //   const embeddingsResult = await Promise.all(
-  //     batch.map(async (node, idx): Promise<BookChunk> => {
-  //       const embedding = await retryWithDelay(
-  //         async () => {
-  //           const response = await embeddings.create({
-  //             input: node.text,
-  //             model: "text-embedding-3-small",
-  //           });
-  //           return response.data[0]!.embedding;
-  //         },
-  //         10,
-  //         // retry if the error is not about the context length
-  //         (e) =>
-  //           !e.message?.includes(
-  //             "400 This model's maximum context length is 8192 tokens",
-  //           ),
-  //       );
+    // we first embed
+    const embeddingsResult = await Promise.all(
+      batch.map(async (node, idx): Promise<BookChunk> => {
+        const embedding = await retryWithDelay(
+          async () => {
+            const response = await embeddings.create({
+              input: node.text,
+              model: "text-embedding-3-large",
+            });
+            return response.data[0]!.embedding;
+          },
+          10,
+          // retry if the error is not about the context length
+          (e) =>
+            !e.message?.includes(
+              "400 This model's maximum context length is 8192 tokens",
+            ),
+        );
 
-  //       if (embedding.error) {
-  //         throw embedding.error;
-  //       }
+        if (embedding.error) {
+          throw embedding.error;
+        }
 
-  //       const nodeIdx = i * batches.length + idx;
+        const nodeIdx = i * batches.length + idx;
 
-  //       const prevId =
-  //         nodeIdx > 0
-  //           ? makeChunkId(book.id, versionSource, versionValue, nodeIdx - 1)
-  //           : undefined;
-  //       const nextId =
-  //         nodeIdx < nodes.length - 1
-  //           ? makeChunkId(book.id, versionSource, versionValue, nodeIdx + 1)
-  //           : undefined;
+        const prevId =
+          nodeIdx > 0
+            ? makeChunkId(book.id, versionSource, versionValue, nodeIdx - 1)
+            : undefined;
+        const nextId =
+          nodeIdx < nodes.length - 1
+            ? makeChunkId(book.id, versionSource, versionValue, nodeIdx + 1)
+            : undefined;
 
-  //       return {
-  //         id: makeChunkId(book.id, versionSource, versionValue, nodeIdx),
-  //         book_version_id: `${versionSource}:${versionValue}`,
-  //         prev_id: prevId,
-  //         next_id: nextId,
-  //         chunk_embedding: embedding.result,
-  //         chunk_content: node.text,
-  //         book_id: book.id,
-  //         chapters: node.metadata.chaptersIndices,
-  //         pages: node.metadata.pages.map((p: any) => ({
-  //           index: p.index,
-  //           page: p.page ? String(p.page) : undefined,
-  //           volume: p.volume ? String(p.volume) : undefined,
-  //         })),
-  //       };
-  //     }),
-  //   );
+        return {
+          id: makeChunkId(book.id, versionSource, versionValue, nodeIdx),
+          book_version_id: `${versionSource}:${versionValue}`,
+          prev_id: prevId,
+          next_id: nextId,
+          chunk_embedding: embedding.result,
+          chunk_content: node.text,
+          book_id: book.id,
+          chapters: node.metadata.chaptersIndices,
+          pages: node.metadata.pages.map((p: any) => ({
+            index: p.index,
+            page: p.page ? String(p.page) : undefined,
+            volume: p.volume ? String(p.volume) : undefined,
+          })),
+        };
+      }),
+    );
 
-  //   await vectorSearchClient.mergeOrUploadDocuments(embeddingsResult);
+    await vectorSearchClient.mergeOrUploadDocuments(embeddingsResult);
 
-  //   i++;
-  // }
+    i++;
+  }
 
   return { status: "success", versionId: versionToIndex.value };
 }
