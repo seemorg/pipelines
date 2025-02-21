@@ -1,6 +1,8 @@
 import type { BookChunk } from "@/lib/azure/vector-search.index";
 import type { Metadata, TextNode } from "llamaindex";
-import { fetchBookContent } from "@/book-fetchers";
+import { fetchBookContent, FetchBookResponse } from "@/book-fetchers";
+import { OpenitiBookResponse } from "@/book-fetchers/openiti";
+import { TurathBookResponse } from "@/book-fetchers/turath";
 import { vectorSearchClient } from "@/lib/azure/vector-search.index";
 import { db } from "@/lib/db";
 import { embeddings } from "@/lib/openai";
@@ -45,6 +47,48 @@ const retryWithDelay = async <T>(
   return { result: null, error: new Error("Exceeded max retries") };
 };
 
+const prepareContent = (
+  bookContent: TurathBookResponse | OpenitiBookResponse,
+) => {
+  if (bookContent.source === "turath") {
+    const chapters = bookContent.turathResponse.headings;
+    const pages = bookContent.turathResponse.pages;
+    return {
+      chapters,
+      preparedPages: preparePages(pages, chapters),
+    };
+  }
+
+  // version.source === 'openiti'
+  const chapters = bookContent.chapters;
+  const pages = bookContent.content;
+
+  return {
+    chapters,
+    preparedPages: preparePages(pages, chapters),
+  };
+};
+
+type PreparedContent = ReturnType<typeof prepareContent>;
+
+const groupPagesByChapter = (
+  preparedPages: PreparedContent["preparedPages"],
+  chapters: PreparedContent["chapters"],
+) => {
+  const level1ChaptersIndices = chapters.reduce((acc, heading, idx) => {
+    if (heading.level === 1) {
+      acc.push(idx);
+    }
+    return acc;
+  }, [] as number[]);
+
+  const pagesByChapter = level1ChaptersIndices.map((idx) =>
+    preparedPages.filter((page) => page.chaptersIndices.includes(idx)),
+  );
+
+  return pagesByChapter;
+};
+
 export async function indexBook(
   params: ({ id: string } | { slug: string }) & {
     versionId: string;
@@ -78,39 +122,21 @@ export async function indexBook(
     },
     versionToIndex.value,
   );
-  if (!bookContent || bookContent.source === "external") {
+
+  if (
+    !bookContent ||
+    (bookContent.source !== "turath" && bookContent.source !== "openiti")
+  ) {
     return { status: "skipped" };
   }
 
   console.log(
     `preparing pages for: ${versionToIndex.source}:${versionToIndex.value}`,
   );
+  const { chapters, preparedPages } = prepareContent(bookContent);
 
-  let chapters;
-  let pages;
-  let preparedPages;
-  if (bookContent.source === "turath") {
-    chapters = bookContent.turathResponse.headings;
-    pages = bookContent.turathResponse.pages;
-    preparedPages = preparePages(pages, chapters);
-  } else {
-    // version.source === 'openiti'
-    chapters = bookContent.chapters;
-    pages = bookContent.content;
-    preparedPages = preparePages(pages, chapters);
-  }
-
-  console.log("splitting into chapters");
-  const level1ChaptersIndices = chapters.reduce((acc, heading, idx) => {
-    if (heading.level === 1) {
-      acc.push(idx);
-    }
-    return acc;
-  }, [] as number[]);
-
-  const pagesByChapter = level1ChaptersIndices.map((idx) =>
-    preparedPages.filter((page) => page.chaptersIndices.includes(idx)),
-  );
+  console.log("splitting text by chapters");
+  const pagesByChapter = groupPagesByChapter(preparedPages, chapters);
 
   const nodes: TextNode<Metadata>[] = [];
   let chapterIdx = 1;
