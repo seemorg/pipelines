@@ -9,7 +9,7 @@ import {
 
 export const worker = new Worker<KeywordIndexerQueueData>(
   KEYWORD_INDEXER_QUEUE_NAME,
-  path.resolve("dist/worker/keyword-indexer.worker.js"),
+  path.resolve("dist/workers/keyword-indexer.worker.js"),
   {
     connection: KEYWORD_INDEXER_QUEUE_REDIS,
     concurrency: 10,
