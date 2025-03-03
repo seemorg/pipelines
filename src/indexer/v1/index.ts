@@ -88,8 +88,7 @@ const groupPagesByChapter = (
 };
 
 const pool = new Tinypool({
-  filename: new URL("../../../dist/src/indexer/v1/worker.js", import.meta.url)
-    .href,
+  filename: new URL("../src/indexer/v1/worker.js", import.meta.url).href,
 });
 
 export async function indexBook(
