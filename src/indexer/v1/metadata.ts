@@ -48,13 +48,18 @@ export const preparePages = (
     shouldRemoveDiacritics?: boolean;
   } = {},
 ) => {
-  return pages.map((p, idx) => {
+  const final = [];
+  let idx = 0;
+
+  for (const p of pages) {
     const isTurath = "text" in p;
     const formattedText = isTurath ? p.text : convertOpenitiToHtml(p.blocks);
 
-    const pageText = stripHtml(
-      shouldRemoveDiacritics ? removeDiacritics(formattedText) : formattedText,
-    ).result;
+    const textWithoutDiacritics = shouldRemoveDiacritics
+      ? removeDiacritics(formattedText)
+      : formattedText;
+
+    const pageText = stripHtml(textWithoutDiacritics).result;
 
     const text = preprocessUsingSplitter
       ? trimSpacesAfterSentenceEndings(
@@ -65,24 +70,24 @@ export const preparePages = (
         )
       : pageText;
 
-    return {
+    final.push({
       index: idx,
       page: p.page,
       volume: isTurath ? p.vol : p.volume,
       text,
       chaptersIndices: getPageChapters(idx, headings),
-    };
-  });
+    });
+    idx++;
+  }
+
+  return final;
 };
 
 type PreparePagesReturnType = ReturnType<typeof preparePages>;
 
 export const attachMetadataToNodes = (
   nodes: TextNode[],
-  book: {
-    id: string;
-    pages: PreparePagesReturnType;
-  },
+  pages: PreparePagesReturnType,
 ) => {
   let positions;
 
@@ -112,7 +117,7 @@ export const attachMetadataToNodes = (
       // });
     } else {
       if (!positions) {
-        positions = getBookPositions(book.pages);
+        positions = getBookPositions(pages);
       }
 
       positions
@@ -135,7 +140,7 @@ export const attachMetadataToNodes = (
     const chaptersIndices = new Set<number>();
 
     for (const idx of matchedIndicesArray) {
-      const page = book.pages[idx]!;
+      const page = pages[idx]!;
       pageNumbers.push({
         index: page.index,
         page: page.page,

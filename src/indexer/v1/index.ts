@@ -1,17 +1,15 @@
 import type { BookChunk } from "@/lib/azure/vector-search.index";
 import type { Metadata, TextNode } from "llamaindex";
-import { fetchBookContent, FetchBookResponse } from "@/book-fetchers";
+import { fetchBookContent } from "@/book-fetchers";
 import { OpenitiBookResponse } from "@/book-fetchers/openiti";
 import { TurathBookResponse } from "@/book-fetchers/turath";
 import { vectorSearchClient } from "@/lib/azure/vector-search.index";
 import { db } from "@/lib/db";
 import { embeddings } from "@/lib/openai";
 import { chunk } from "@/utils";
-import { Document } from "llamaindex";
+import Tinypool from "tinypool";
 
-import { attachMetadataToNodes, preparePages } from "./metadata";
-import { splitter } from "./splitter";
-import { JOIN_PAGES_DELIMITER } from "./utils";
+import { preparePages } from "./metadata";
 
 const MAX_RETRIES = 3;
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -89,6 +87,11 @@ const groupPagesByChapter = (
   return pagesByChapter;
 };
 
+const pool = new Tinypool({
+  filename: new URL("../../../dist/src/indexer/v1/worker.js", import.meta.url)
+    .href,
+});
+
 export async function indexBook(
   params: ({ id: string } | { slug: string }) & {
     versionId: string;
@@ -139,32 +142,34 @@ export async function indexBook(
   const pagesByChapter = groupPagesByChapter(preparedPages, chapters);
 
   const nodes: TextNode<Metadata>[] = [];
-  let chapterIdx = 1;
-  for (const chapterPages of pagesByChapter) {
-    console.log(`splitting chapter ${chapterIdx++} / ${pagesByChapter.length}`);
-    if (chapterPages.length === 0) continue;
 
-    const concatenatedContent = chapterPages
-      .map((p) => p.text)
-      .join(JOIN_PAGES_DELIMITER);
-
-    const doc = new Document({
-      metadata: {},
-      text: concatenatedContent,
-    });
-
-    const chapterNodes = splitter.getNodesFromDocuments([doc]);
+  const chapterBatches = chunk(pagesByChapter, 3);
+  let chapterBatchIdx = 0;
+  for (const chapterBatch of chapterBatches) {
+    console.log(
+      `splitting chapter ${++chapterBatchIdx} / ${chapterBatches.length}`,
+    );
 
     try {
-      attachMetadataToNodes(chapterNodes, {
-        id: book.id,
-        pages: chapterPages,
-      });
-    } catch (e) {
-      return { status: "error", reason: "Failed to attach metadata", error: e };
-    }
+      const results = await Promise.all(
+        chapterBatch.map(async (chapterPages, idx) => {
+          if (chapterPages.length === 0) return;
 
-    nodes.push(...chapterNodes);
+          const finalNodes = await pool.run({ chapterPages });
+          console.log(`- chapter ${idx + 1} / 3 done`);
+
+          if (finalNodes.status === "error") {
+            throw finalNodes;
+          }
+
+          return finalNodes;
+        }),
+      );
+
+      nodes.push(...results.flat());
+    } catch (e) {
+      return e;
+    }
   }
 
   const batches = chunk(nodes, 30);

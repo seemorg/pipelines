@@ -7,6 +7,7 @@ export default defineConfig((options: Options) => ({
     "workers/ai-indexer.worker.ts",
     "workers/keyword-indexer.worker.ts",
     "workers/typesense.worker.ts",
+    "src/indexer/v1/worker.ts",
   ],
   clean: true,
   format: "esm",
