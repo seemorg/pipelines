@@ -144,6 +144,10 @@ export async function indexBook(
   for (const chapterPages of pagesByChapter) {
     console.log(`splitting chapter ${++chapterIdx} / ${pagesByChapter.length}`);
 
+    if (chapterPages.length === 0) {
+      continue;
+    }
+
     const concatenatedContent = chapterPages
       .map((p) => p.text)
       .join(JOIN_PAGES_DELIMITER);
