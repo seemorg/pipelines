@@ -8,5 +8,5 @@ export const client = new Typesense.Client({
     },
   ],
   apiKey: env.TYPESENSE_API_KEY,
-  connectionTimeoutSeconds: 5,
+  connectionTimeoutSeconds: 5 * 60, // 5 mins
 });
