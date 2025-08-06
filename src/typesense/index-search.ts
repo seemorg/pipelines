@@ -37,7 +37,10 @@ export const indexTypesenseSearch = async () => {
   for (const batch of batches) {
     console.log(`Indexing batch ${i} / ${batches.length}`);
 
-    await client.collections(INDEX_NAME).documents().import(batch);
+    await client
+      .collections(INDEX_NAME)
+      .documents()
+      .import(batch, { action: "upsert" });
 
     i++;
   }
