@@ -7,7 +7,7 @@ import { prepareTypesenseGenresData } from "./genre";
 import { prepareTypesenseRegionsData } from "./region";
 
 export const COLLECTION_NAME = "all_documents";
-export const BATCH_SIZE = 50;
+export const BATCH_SIZE = 30;
 
 export const TYPESENSE_SEARCH_SCHEMA = (
   indexName: string,

@@ -5,7 +5,7 @@ import { dedupeStrings, getNamesVariations } from "@/utils";
 import { prepareTypesenseAuthorsData } from "./author";
 
 export const COLLECTION_NAME = "books";
-export const BATCH_SIZE = 50;
+export const BATCH_SIZE = 30;
 
 export const TYPESENSE_BOOK_SCHEMA = (
   collection: string,
