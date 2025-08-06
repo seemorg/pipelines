@@ -40,6 +40,10 @@ export const TYPESENSE_BOOK_SCHEMA = (
       type: "object[]",
     },
     {
+      name: "otherNameTransliterations",
+      type: "string[]",
+    },
+    {
       name: "_nameVariations",
       type: "string[]",
     },
@@ -91,6 +95,7 @@ export interface TypesenseBook {
   id: string;
   slug: string;
   transliteration?: string;
+  otherNameTransliterations: string[];
   authorId: string;
   primaryNames: {
     text: string;
@@ -151,6 +156,7 @@ export const prepareTypesenseBooksData = async () => {
           locale: true,
         },
       },
+      otherNameTransliterations: true,
       authorId: true,
       genres: {
         select: {
@@ -170,6 +176,7 @@ export const prepareTypesenseBooksData = async () => {
       id: book.id,
       slug: book.slug,
       transliteration: book.transliteration ?? undefined,
+      otherNameTransliterations: book.otherNameTransliterations,
       primaryNames: book.primaryNameTranslations,
       otherNames:
         book.otherNameTranslations.length === 0

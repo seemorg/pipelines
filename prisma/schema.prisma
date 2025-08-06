@@ -19,12 +19,14 @@ enum AuthorYearStatus {
 }
 
 model Author {
-  id   String @id
-  slug String @unique
+  id             String                @id
+  slug           String                @unique
+  alternateSlugs AuthorAlternateSlug[]
 
-  primaryNameTranslations AuthorPrimaryName[]
-  otherNameTranslations   AuthorOtherNames[]
-  transliteration         String?
+  primaryNameTranslations   AuthorPrimaryName[]
+  otherNameTranslations     AuthorOtherNames[]
+  transliteration           String?
+  otherNameTransliterations String[]
 
   year            Int?
   yearStatus      AuthorYearStatus?
@@ -39,6 +41,14 @@ model Author {
 
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
+}
+
+model AuthorAlternateSlug {
+  slug     String @unique
+  authorId String
+  author   Author @relation(fields: [authorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@id([slug])
 }
 
 model AuthorBio {
@@ -72,12 +82,14 @@ model AuthorOtherNames {
 }
 
 model Book {
-  id   String @id
-  slug String
+  id             String              @id
+  slug           String              @unique
+  alternateSlugs BookAlternateSlug[]
 
-  primaryNameTranslations BookPrimaryName[]
-  otherNameTranslations   BookOtherNames[]
-  transliteration         String?
+  primaryNameTranslations   BookPrimaryName[]
+  otherNameTranslations     BookOtherNames[]
+  transliteration           String?
+  otherNameTransliterations String[]
 
   /// [BookVersion]
   versions         Json[]
@@ -98,6 +110,14 @@ model Book {
 
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
+}
+
+model BookAlternateSlug {
+  slug   String @unique
+  bookId String
+  book   Book   @relation(fields: [bookId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@id([slug])
 }
 
 model BookPrimaryName {

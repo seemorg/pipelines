@@ -39,6 +39,10 @@ export const TYPESENSE_AUTHOR_SCHEMA = (
       type: "object[]",
     },
     {
+      name: "otherNameTransliterations",
+      type: "string[]",
+    },
+    {
       name: "geographies",
       type: "string[]",
       facet: true,
@@ -76,6 +80,7 @@ export interface AuthorDocument {
   id: string;
   slug: string;
   transliteration?: string;
+  otherNameTransliterations: string[];
   year?: number;
   primaryNames: {
     locale: string;
@@ -117,6 +122,7 @@ export const prepareTypesenseAuthorsData = async () => {
           locale: true,
         },
       },
+      otherNameTransliterations: true,
       locations: true,
       _count: {
         select: {
@@ -132,6 +138,7 @@ export const prepareTypesenseAuthorsData = async () => {
       slug: author.slug,
       year: author.year ? author.year : undefined,
       transliteration: author.transliteration ?? undefined,
+      otherNameTransliterations: author.otherNameTransliterations,
       primaryNames: author.primaryNameTranslations,
       otherNames:
         author.otherNameTranslations.length === 0

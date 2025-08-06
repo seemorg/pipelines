@@ -31,6 +31,11 @@ export const TYPESENSE_REGION_SCHEMA = (
       type: "string",
       optional: true,
     },
+    {
+      name: "currentNameTransliteration",
+      type: "string",
+      optional: true,
+    },
 
     {
       name: "subLocations",
@@ -63,6 +68,7 @@ export interface TypesenseRegion {
   names: { locale: string; text: string }[];
   currentNames: { locale: string; text: string }[];
   transliteration?: string;
+  currentNameTransliteration?: string;
 
   subLocations?: { locale: string; text: string }[];
   subLocationsCount: number;
@@ -78,6 +84,7 @@ export const prepareTypesenseRegionsData = async () => {
       id: true,
       slug: true,
       transliteration: true,
+      currentNameTransliteration: true,
       numberOfAuthors: true,
       numberOfBooks: true,
       currentNameTranslations: {
@@ -125,6 +132,8 @@ export const prepareTypesenseRegionsData = async () => {
       names: region.nameTranslations,
       transliteration: region.transliteration ?? undefined,
       currentNames: region.currentNameTranslations,
+      currentNameTransliteration:
+        region.currentNameTransliteration ?? undefined,
       booksCount: region.numberOfBooks,
       authorsCount: region.numberOfAuthors,
       _popularity: region.numberOfBooks + region.numberOfAuthors,
