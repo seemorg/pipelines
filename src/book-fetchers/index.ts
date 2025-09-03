@@ -1,8 +1,8 @@
 import type { OpenitiBookResponse } from "./openiti";
 import type { TurathBookResponse } from "./turath";
-import _uploadedVersions from "../../scripts/enqueue-missing-books/uploaded-versions.json";
 import { fetchOpenitiBook } from "./openiti";
 import { fetchTurathBook } from "./turath";
+import _uploadedVersions from "./uploaded-versions.json";
 
 const uploadedVersions = _uploadedVersions as Record<string, boolean>;
 
