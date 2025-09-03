@@ -28,14 +28,16 @@ const trimSpacesAfterSentenceEndings = (text: string): string => {
 
 type Pages =
   | Pick<FetchBookResponseOfType<"turath">["turathResponse"], "pages">["pages"]
-  | FetchBookResponseOfType<"openiti">["content"];
+  | FetchBookResponseOfType<"openiti">["content"]
+  | FetchBookResponseOfType<"pdf">["pages"];
 
 type Chapters =
   | Pick<
       FetchBookResponseOfType<"turath">["turathResponse"],
       "headings"
     >["headings"]
-  | FetchBookResponseOfType<"openiti">["chapters"];
+  | FetchBookResponseOfType<"openiti">["chapters"]
+  | FetchBookResponseOfType<"pdf">["headings"];
 
 export const preparePages = (
   pages: Pages,
@@ -53,7 +55,11 @@ export const preparePages = (
 
   for (const p of pages) {
     const isTurath = "text" in p;
-    const formattedText = isTurath ? p.text : convertOpenitiToHtml(p.blocks);
+    const formattedText = isTurath
+      ? p.text
+      : "content" in p
+        ? (p.content ?? "")
+        : convertOpenitiToHtml(p.blocks);
 
     const textWithoutDiacritics = shouldRemoveDiacritics
       ? removeDiacritics(formattedText)

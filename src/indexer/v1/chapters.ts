@@ -3,6 +3,7 @@ import type { fetchBookContent } from "@/book-fetchers";
 type Book = NonNullable<Awaited<ReturnType<typeof fetchBookContent>>>;
 type Headings =
   | Extract<Book, { source: "turath" }>["turathResponse"]["headings"]
+  | Extract<Book, { source: "pdf" }>["headings"]
   | (Extract<Book, { source: "openiti" }>["chapters"][number] & {
       pageIndex?: number;
     })[];
@@ -18,7 +19,10 @@ export const getPageChapters = (pageIdx: number, headings: Headings) => {
       pageHeadings = [i];
     } else {
       const lastIdx = pageHeadings[pageHeadings.length - 1];
-      if (pageHeadings.length > 0 && headings[lastIdx].level >= heading.level) {
+      if (
+        pageHeadings.length > 0 &&
+        headings[lastIdx!]!.level >= heading.level
+      ) {
         // if the last heading is the same level, replace it with the current one
         pageHeadings[pageHeadings.length - 1] = i;
       } else {

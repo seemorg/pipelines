@@ -1,6 +1,6 @@
 import type { BookChunk } from "@/lib/azure/vector-search.index";
 import type { Metadata, TextNode } from "llamaindex";
-import { fetchBookContent } from "@/book-fetchers";
+import { fetchBookContent, OcrBookResponse } from "@/book-fetchers";
 import { OpenitiBookResponse } from "@/book-fetchers/openiti";
 import { TurathBookResponse } from "@/book-fetchers/turath";
 import { vectorSearchClient } from "@/lib/azure/vector-search.index";
@@ -48,7 +48,7 @@ const retryWithDelay = async <T>(
 };
 
 const prepareContent = (
-  bookContent: TurathBookResponse | OpenitiBookResponse,
+  bookContent: TurathBookResponse | OpenitiBookResponse | OcrBookResponse,
 ) => {
   if (bookContent.source === "turath") {
     const chapters = bookContent.turathResponse.headings;
@@ -59,9 +59,18 @@ const prepareContent = (
     };
   }
 
-  // version.source === 'openiti'
-  const chapters = bookContent.chapters;
-  const pages = bookContent.content;
+  if (bookContent.source === "openiti") {
+    const chapters = bookContent.chapters;
+    const pages = bookContent.content;
+
+    return {
+      chapters,
+      preparedPages: preparePages(pages, chapters),
+    };
+  }
+
+  const chapters = bookContent.headings;
+  const pages = bookContent.pages;
 
   return {
     chapters,
@@ -125,7 +134,9 @@ export async function indexBook(
 
   if (
     !bookContent ||
-    (bookContent.source !== "turath" && bookContent.source !== "openiti")
+    (bookContent.source !== "turath" &&
+      bookContent.source !== "openiti" &&
+      bookContent.source !== "pdf")
   ) {
     return { status: "skipped" };
   }

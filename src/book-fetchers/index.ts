@@ -1,17 +1,44 @@
 import type { OpenitiBookResponse } from "./openiti";
 import type { TurathBookResponse } from "./turath";
+import _uploadedVersions from "../../scripts/enqueue-missing-books/uploaded-versions.json";
 import { fetchOpenitiBook } from "./openiti";
 import { fetchTurathBook } from "./turath";
+
+const uploadedVersions = _uploadedVersions as Record<string, boolean>;
 
 export type ExternalBookResponse = {
   source: "external";
   versionId: string;
 };
 
+export type OcrBookResponse = {
+  id: string;
+  source: "pdf";
+  publicationDetails: PrismaJson.BookVersion["publicationDetails"];
+  url: string;
+  pages: {
+    volume: number | null;
+    page: number | null;
+    content: string | null;
+    footnotes: string | null;
+    editorialNotes: string | null;
+  }[];
+  headings: {
+    title: string;
+    level: number;
+    page: {
+      volume: number | null;
+      page: number | null;
+    };
+    pageIndex: number;
+  }[];
+};
+
 export type FetchBookResponse =
   | TurathBookResponse
   | OpenitiBookResponse
-  | ExternalBookResponse;
+  | ExternalBookResponse
+  | OcrBookResponse;
 
 export type FetchBookResponseOfType<T extends FetchBookResponse["source"]> =
   Extract<FetchBookResponse, { source: T }>;
@@ -65,6 +92,22 @@ export const fetchBookContent = async (
       ...baseResponse,
       ...turathBook,
     } as TurathBookResponse;
+  }
+
+  if (version.source === "pdf" && version.ocrBookId) {
+    const key = `book-content/ocr/${version.ocrBookId}.json`;
+    if (uploadedVersions[key]) {
+      const ocrBook = await (
+        await fetch(`https://assets.usul.ai/${key}`)
+      ).json();
+      return {
+        ...baseResponse,
+        url: version.value,
+        ...(ocrBook as any),
+      } as FetchBookResponse;
+    }
+
+    return { ...baseResponse, url: version.value } as FetchBookResponse;
   }
 
   const openitiBook = await fetchOpenitiBook({

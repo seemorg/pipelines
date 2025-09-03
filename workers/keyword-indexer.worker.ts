@@ -85,9 +85,13 @@ export default async function keywordIndexerWorker(
         shouldRemoveDiacritics: false,
       },
     );
-  } else {
-    // version.source === 'openiti'
+  } else if (bookContent.source === "openiti") {
     preparedPages = preparePages(bookContent.content, bookContent.chapters, {
+      preprocessUsingSplitter: false,
+      shouldRemoveDiacritics: false,
+    });
+  } else {
+    preparedPages = preparePages(bookContent.pages, bookContent.headings, {
       preprocessUsingSplitter: false,
       shouldRemoveDiacritics: false,
     });
