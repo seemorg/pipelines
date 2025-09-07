@@ -22,6 +22,7 @@ export const TYPESENSE_GENRE_SCHEMA = (
       name: "transliteration",
       type: "string",
       optional: true,
+      sort: true,
     },
     {
       name: "nameTranslations",

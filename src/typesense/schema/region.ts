@@ -30,6 +30,7 @@ export const TYPESENSE_REGION_SCHEMA = (
       name: "transliteration",
       type: "string",
       optional: true,
+      sort: true,
     },
     {
       name: "currentNameTransliteration",

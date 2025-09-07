@@ -25,6 +25,7 @@ export const TYPESENSE_BOOK_SCHEMA = (
       name: "transliteration",
       type: "string",
       optional: true,
+      sort: true,
     },
     {
       name: "authorId",
