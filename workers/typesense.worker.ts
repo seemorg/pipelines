@@ -5,6 +5,7 @@ import { purgeAllCloudflareCache } from "@/lib/cloudflare";
 import { indexAuthors } from "@/typesense/index-authors";
 import { indexBooks } from "@/typesense/index-books";
 import { indexTypesenseGenres } from "@/typesense/index-genres";
+import { indexTypesenseAdvancedGenres } from "@/typesense/index-advanced-genres";
 import { indexTypesenseRegions } from "@/typesense/index-regions";
 import { indexTypesenseSearch } from "@/typesense/index-search";
 
@@ -21,6 +22,9 @@ export default async function typesenseWorker(
 
     await indexTypesenseGenres();
     await job.updateProgress(60);
+
+    await indexTypesenseAdvancedGenres();
+    await job.updateProgress(70);
 
     await indexTypesenseRegions();
     await job.updateProgress(80);
