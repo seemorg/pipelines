@@ -13,6 +13,7 @@ export type BookDocument = {
   _popularity: number;
   versions: PrismaJson.BookVersion[];
   genreIds: string[];
+  advancedGenreIds: string[];
 
   // these are derived from the author
   author: {

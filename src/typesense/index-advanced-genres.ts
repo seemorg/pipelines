@@ -39,6 +39,11 @@ export const indexTypesenseAdvancedGenres = async () => {
             .documents()
             .import(batch, { action: "upsert" });
 
+        // Small delay to reduce write load on Typesense server
+        if (i < batches.length) {
+            await new Promise((resolve) => setTimeout(resolve, 50));
+        }
+
         i++;
     }
 

@@ -2,7 +2,7 @@ import type { CollectionCreateSchema } from "typesense/lib/Typesense/Collections
 import { db } from "@/lib/db";
 
 export const COLLECTION_NAME = "genres";
-export const BATCH_SIZE = 30;
+export const BATCH_SIZE = 100;
 
 export const TYPESENSE_GENRE_SCHEMA = (
   indexName: string,

@@ -26,7 +26,7 @@ export const indexTypesenseSearch = async () => {
   if (!hasCollectionAliases) {
     try {
       await client.collections(COLLECTION_NAME).delete();
-    } catch (e) {}
+    } catch (e) { }
   }
 
   await client.collections().create(TYPESENSE_SEARCH_SCHEMA(INDEX_NAME));
@@ -42,6 +42,11 @@ export const indexTypesenseSearch = async () => {
       .documents()
       .import(batch, { action: "upsert" });
 
+    // Small delay to reduce write load on Typesense server
+    if (i < batches.length) {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    }
+
     i++;
   }
 
@@ -50,7 +55,7 @@ export const indexTypesenseSearch = async () => {
 
     console.log("Deleting old alias...");
     await client.collections(collection.collection_name).delete();
-  } catch (e) {}
+  } catch (e) { }
 
   console.log("Linking new collection to alias...");
   await client

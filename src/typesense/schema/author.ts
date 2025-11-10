@@ -3,7 +3,7 @@ import { db } from "@/lib/db";
 import { dedupeStrings, getNamesVariations } from "@/utils";
 
 export const COLLECTION_NAME = "authors";
-export const BATCH_SIZE = 30;
+export const BATCH_SIZE = 100;
 
 export const TYPESENSE_AUTHOR_SCHEMA = (
   collection: string,
