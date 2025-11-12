@@ -1,6 +1,7 @@
 import { client } from "@/lib/typesense";
 import { chunk } from "@/utils";
 
+import { cleanupOldCollections, swapAlias } from "./collection-utils";
 import {
     BATCH_SIZE,
     COLLECTION_NAME,
@@ -12,6 +13,7 @@ export const indexTypesenseAdvancedGenres = async () => {
     const INDEX_NAME = `${COLLECTION_NAME}_${Date.now()}`;
     const documents = await prepareTypesenseAdvancedGenresData();
 
+    // Check if alias exists, if not, try to delete any old collection with the base name
     let hasCollectionAliases = true;
     try {
         await client.aliases(COLLECTION_NAME).retrieve();
@@ -22,7 +24,9 @@ export const indexTypesenseAdvancedGenres = async () => {
     if (!hasCollectionAliases) {
         try {
             await client.collections(COLLECTION_NAME).delete();
-        } catch (e) { }
+        } catch (e) {
+            // Collection doesn't exist, that's fine
+        }
     }
 
     await client
@@ -49,17 +53,12 @@ export const indexTypesenseAdvancedGenres = async () => {
 
     console.log(`Indexed ${documents.length} ${COLLECTION_NAME}`);
 
-    try {
-        const collection = await client.aliases(COLLECTION_NAME).retrieve();
+    // Swap alias to point to new collection and delete old one
+    await swapAlias(COLLECTION_NAME, INDEX_NAME);
 
-        console.log("Deleting old alias...");
-        await client.collections(collection.collection_name).delete();
-    } catch (e) { }
-
-    console.log("Linking new collection to alias...");
-    await client
-        .aliases()
-        .upsert(COLLECTION_NAME, { collection_name: INDEX_NAME });
+    // Clean up any orphaned collections (keep only latest 2 versions)
+    // Exclude the current collection to be extra safe
+    await cleanupOldCollections(COLLECTION_NAME, 2, INDEX_NAME);
 };
 
 
