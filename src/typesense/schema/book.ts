@@ -197,7 +197,7 @@ export const prepareTypesenseBooksData = async () => {
       genreIds: book.genres.map((genre) => genre.id),
       advancedGenreIds: book.advancedGenres.map((genre) => genre.id),
       versions: book.versions,
-      year: author.year,
+      year: author.year ?? 1,
       authorId: book.authorId,
       author: {
         id: author.id,
