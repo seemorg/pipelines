@@ -69,6 +69,11 @@ export const TYPESENSE_BOOK_SCHEMA = (
       facet: true,
     },
     {
+      name: "empires",
+      type: "string[]",
+      facet: true,
+    },
+    {
       name: "author",
       type: "object",
       optional: true,
@@ -116,6 +121,7 @@ export interface TypesenseBook {
   year?: number;
   geographies: string[];
   regions: string[];
+  empires: string[];
   genreIds: string[];
   advancedGenreIds: string[];
   versions: PrismaJson.BookVersion[];
@@ -211,6 +217,7 @@ export const prepareTypesenseBooksData = async () => {
       },
       geographies: author.geographies,
       regions: author.regions,
+      empires: author.empires,
       _popularity: author._popularity,
       coverUrl: book.coverImageUrl ?? undefined,
       _nameVariations: dedupeStrings(

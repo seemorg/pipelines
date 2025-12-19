@@ -8,6 +8,7 @@ import { indexTypesenseGenres } from "@/typesense/index-genres";
 import { indexTypesenseAdvancedGenres } from "@/typesense/index-advanced-genres";
 import { indexTypesenseRegions } from "@/typesense/index-regions";
 import { indexTypesenseSearch } from "@/typesense/index-search";
+import { indexTypesenseEmpires } from "@/typesense/index-empires";
 
 export default async function typesenseWorker(
   job: SandboxedJob<TypesenseQueueData>,
@@ -21,12 +22,15 @@ export default async function typesenseWorker(
     await job.updateProgress(40);
 
     await indexTypesenseGenres();
-    await job.updateProgress(60);
+    await job.updateProgress(50);
 
     await indexTypesenseAdvancedGenres();
-    await job.updateProgress(70);
+    await job.updateProgress(60);
 
     await indexTypesenseRegions();
+    await job.updateProgress(70);
+
+    await indexTypesenseEmpires();
     await job.updateProgress(80);
 
     await indexTypesenseSearch();

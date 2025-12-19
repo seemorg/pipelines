@@ -54,6 +54,11 @@ export const TYPESENSE_AUTHOR_SCHEMA = (
       facet: true,
     },
     {
+      name: "empires",
+      type: "string[]",
+      facet: true,
+    },
+    {
       // this is an internal field that we'll use to search for name variations
       name: "_nameVariations",
       type: "string[]",
@@ -93,6 +98,7 @@ export interface AuthorDocument {
   }[];
   geographies: string[];
   regions: string[];
+  empires: string[];
   _nameVariations?: string[];
   _popularity: number;
   booksCount?: number;
@@ -125,6 +131,7 @@ export const prepareTypesenseAuthorsData = async () => {
       },
       otherNameTransliterations: true,
       locations: true,
+      empires: true,
       _count: {
         select: {
           books: true,
@@ -149,6 +156,7 @@ export const prepareTypesenseAuthorsData = async () => {
       regions: dedupeStrings(
         author.locations.map((l) => l.regionId).filter(Boolean) as string[],
       ),
+      empires: author.empires.map((e) => e.id),
       booksCount: author._count.books,
       _popularity: author._count.books,
       _nameVariations: dedupeStrings(
