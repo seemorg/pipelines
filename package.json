@@ -10,10 +10,13 @@
     "build": "pnpm with-env tsup-node",
     "clean": "rm -rf node_modules",
     "lint": "eslint",
-    "format": "prettier --check . --ignore-path ../../.gitignore",
+    "format": "prettier --check . --ignore-path ./.gitignore",
     "typecheck": "tsc --noEmit",
-    "with-env": "dotenv -e ../../.env --",
+    "with-env": "dotenv -e ./.env --",
     "run:script": "pnpm tsx --env-file=.env"
+  },
+  "prisma": {
+    "schema": "prisma/schema"
   },
   "dependencies": {
     "@ai-sdk/azure": "^1.1.9",
@@ -24,7 +27,7 @@
     "@hono/node-server": "^1.12.0",
     "@hono/zod-validator": "^0.4.1",
     "@openiti/markdown-parser": "^1.2.2",
-    "@prisma/client": "^5.17.0",
+    "@prisma/client": "^6.10.1",
     "@t3-oss/env-core": "^0.10.1",
     "ai": "^4.1.26",
     "bullmq": "^5.10.3",
@@ -50,7 +53,7 @@
     "eslint": "^9.7.0",
     "eslint-plugin-import": "^2.29.1",
     "prettier": "^3.3.3",
-    "prisma": "^5.17.0",
+    "prisma": "^6.10.1",
     "tsup": "^8.0.2",
     "tsx": "^3.12.7",
     "typescript": "^5.5.3",
