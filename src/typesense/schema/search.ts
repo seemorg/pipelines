@@ -5,6 +5,8 @@ import { prepareTypesenseAuthorsData } from "./author";
 import { prepareTypesenseBooksData } from "./book";
 import { prepareTypesenseGenresData } from "./genre";
 import { prepareTypesenseRegionsData } from "./region";
+import { prepareTypesenseEmpiresData } from "./empire";
+import { prepareTypesenseAdvancedGenresData } from "./advancedGenre";
 
 export const COLLECTION_NAME = "all_documents";
 export const BATCH_SIZE = 100;
@@ -77,7 +79,14 @@ export const TYPESENSE_SEARCH_SCHEMA = (
   ],
 });
 
-const types = ["author", "book", "genre", "region"] as const;
+const types = [
+  "author",
+  "book",
+  "genre",
+  "advanced-genre",
+  "region",
+  "empire",
+] as const;
 type SearchDocumentType = (typeof types)[number];
 
 export interface SearchDocument {
@@ -117,11 +126,13 @@ export interface SearchDocument {
 
 const getRankByType = (type: SearchDocumentType) => {
   if (type === "region") return 1;
-  if (type === "genre") return 2;
-  if (type === "author") return 3;
+  if (type === "empire") return 2;
+  if (type === "genre") return 3;
+  if (type === "advanced-genre") return 4;
+  if (type === "author") return 5;
 
   // book
-  return 4;
+  return 6;
 };
 
 export const prepareTypesenseSearchDocuments = async () => {
@@ -194,40 +205,124 @@ export const prepareTypesenseSearchDocuments = async () => {
     if (type === "region") {
       const data = await prepareTypesenseRegionsData();
 
-      iterationDocuments = data.map((regionDocument): SearchDocument => {
-        const otherNames = Object.entries(
-          regionDocument.currentNames.reduce(
-            (acc, curr) => {
-              if (acc[curr.locale]) {
-                acc[curr.locale]!.push(curr.text);
-              } else {
-                acc[curr.locale] = [curr.text];
+      if (!Array.isArray(data)) {
+        console.warn("prepareTypesenseRegionsData did not return an array");
+        iterationDocuments = [];
+      } else {
+        iterationDocuments = data
+          .filter(
+            (regionDocument) =>
+              regionDocument != null &&
+              regionDocument.id != null &&
+              regionDocument.slug != null &&
+              Array.isArray(regionDocument.names),
+          )
+          .map((regionDocument): SearchDocument => {
+            // Ensure currentNames is always an array - handle null, undefined, or non-array values
+            let currentNames: Array<{ locale: string; text: string }> = [];
+            if (
+              regionDocument.currentNames != null &&
+              Array.isArray(regionDocument.currentNames)
+            ) {
+              currentNames = regionDocument.currentNames.filter(
+                (item): item is { locale: string; text: string } =>
+                  item != null &&
+                  typeof item === "object" &&
+                  "locale" in item &&
+                  "text" in item &&
+                  typeof item.locale === "string" &&
+                  typeof item.text === "string",
+              );
+            }
+
+            // Only process otherNames if we have valid currentNames
+            let otherNames: Array<{ texts: string[]; locale: string }> | undefined;
+            if (currentNames.length > 0) {
+              try {
+                const grouped = currentNames.reduce(
+                  (acc, curr) => {
+                    if (curr.locale && curr.text) {
+                      if (acc[curr.locale]) {
+                        acc[curr.locale]!.push(curr.text);
+                      } else {
+                        acc[curr.locale] = [curr.text];
+                      }
+                    }
+                    return acc;
+                  },
+                  {} as Record<string, string[]>,
+                );
+                otherNames = Object.entries(grouped).map(([locale, texts]) => ({
+                  texts,
+                  locale,
+                }));
+              } catch (error) {
+                console.warn(
+                  `Error processing otherNames for region ${regionDocument.id}:`,
+                  error,
+                );
+                otherNames = undefined;
               }
+            }
 
-              return acc;
-            },
-            {} as Record<string, string[]>,
-          ),
-        ).map(([locale, texts]) => ({ texts, locale }));
+            return {
+              type: "region",
+              id: regionDocument.id,
+              slug: regionDocument.slug,
+              transliteration: regionDocument.transliteration,
+              primaryNames: regionDocument.names,
+              otherNames,
+              booksCount: regionDocument.booksCount ?? 0,
+              _nameVariations: dedupeStrings(
+                getNamesVariations([
+                  ...currentNames
+                    .filter((n) => n?.text)
+                    .map((n) => n.text),
+                  ...(Array.isArray(regionDocument.subLocations)
+                    ? regionDocument.subLocations
+                      .filter((n) => n?.text)
+                      .map((n) => n.text)
+                    : []),
+                ]),
+              ),
+              _popularity: regionDocument._popularity ?? 0,
+              _rank: getRankByType(type),
+            };
+          });
+      }
+    }
 
+    if (type === "empire") {
+      const data = await prepareTypesenseEmpiresData();
+      iterationDocuments = data.map((empireDocument): SearchDocument => {
         return {
-          type: "region",
-          id: regionDocument.id,
-          slug: regionDocument.slug,
-          transliteration: regionDocument.transliteration,
-          primaryNames: regionDocument.names,
-          otherNames,
-          booksCount: regionDocument.booksCount,
-          _nameVariations: dedupeStrings(
-            getNamesVariations([
-              ...regionDocument.currentNames.map((n) => n.text),
-              ...(regionDocument.subLocations ?? []).map((n) => n.text),
-            ]),
-          ),
-          _popularity: regionDocument._popularity,
+          type: "empire",
+          id: empireDocument.id,
+          slug: empireDocument.slug,
+          primaryNames: empireDocument.names,
+          booksCount: empireDocument.booksCount,
+          _popularity: empireDocument._popularity,
           _rank: getRankByType(type),
         };
       });
+    }
+
+    if (type === "advanced-genre") {
+      const data = await prepareTypesenseAdvancedGenresData();
+      iterationDocuments = data.map(
+        (advancedGenreDocument): SearchDocument => {
+          return {
+            type: "advanced-genre",
+            id: advancedGenreDocument.id,
+            slug: advancedGenreDocument.slug,
+            transliteration: advancedGenreDocument.transliteration ?? undefined,
+            primaryNames: advancedGenreDocument.nameTranslations,
+            booksCount: advancedGenreDocument.booksCount,
+            _popularity: advancedGenreDocument._popularity,
+            _rank: getRankByType(type),
+          };
+        },
+      );
     }
 
     documents.push(...iterationDocuments);
