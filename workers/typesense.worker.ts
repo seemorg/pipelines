@@ -35,6 +35,8 @@ export default async function typesenseWorker(
 
     await indexTypesenseSearch();
     await job.updateProgress(100);
+
+    console.log("Typesense indexing completed");
   } catch (e: any) {
     if ("importResults" in e) {
       throw new Error(

@@ -132,6 +132,7 @@ export const prepareTypesenseAuthorsData = async () => {
       otherNameTransliterations: true,
       locations: true,
       empires: true,
+      regions: true,
       _count: {
         select: {
           books: true,
@@ -153,9 +154,7 @@ export const prepareTypesenseAuthorsData = async () => {
           ? [{ texts: [], locale: "en" }]
           : author.otherNameTranslations,
       geographies: dedupeStrings(author.locations.map((l) => l.id)),
-      regions: dedupeStrings(
-        author.locations.map((l) => l.regionId).filter(Boolean) as string[],
-      ),
+      regions: author.regions.map((r) => r.id),
       empires: author.empires.map((e) => e.id),
       booksCount: author._count.books,
       _popularity: author._count.books,
