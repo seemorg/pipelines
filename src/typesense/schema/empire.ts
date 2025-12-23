@@ -40,7 +40,9 @@ export const TYPESENSE_EMPIRE_SCHEMA = (
 export interface TypesenseEmpire {
   id: string;
   slug: string;
+
   names: { locale: string; text: string }[];
+
   booksCount: number;
   authorsCount: number;
   _popularity: number;

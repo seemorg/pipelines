@@ -218,71 +218,16 @@ export const prepareTypesenseSearchDocuments = async () => {
               Array.isArray(regionDocument.names),
           )
           .map((regionDocument): SearchDocument => {
-            // Ensure currentNames is always an array - handle null, undefined, or non-array values
-            let currentNames: Array<{ locale: string; text: string }> = [];
-            if (
-              regionDocument.currentNames != null &&
-              Array.isArray(regionDocument.currentNames)
-            ) {
-              currentNames = regionDocument.currentNames.filter(
-                (item): item is { locale: string; text: string } =>
-                  item != null &&
-                  typeof item === "object" &&
-                  "locale" in item &&
-                  "text" in item &&
-                  typeof item.locale === "string" &&
-                  typeof item.text === "string",
-              );
-            }
-
-            // Only process otherNames if we have valid currentNames
-            let otherNames: Array<{ texts: string[]; locale: string }> | undefined;
-            if (currentNames.length > 0) {
-              try {
-                const grouped = currentNames.reduce(
-                  (acc, curr) => {
-                    if (curr.locale && curr.text) {
-                      if (acc[curr.locale]) {
-                        acc[curr.locale]!.push(curr.text);
-                      } else {
-                        acc[curr.locale] = [curr.text];
-                      }
-                    }
-                    return acc;
-                  },
-                  {} as Record<string, string[]>,
-                );
-                otherNames = Object.entries(grouped).map(([locale, texts]) => ({
-                  texts,
-                  locale,
-                }));
-              } catch (error) {
-                console.warn(
-                  `Error processing otherNames for region ${regionDocument.id}:`,
-                  error,
-                );
-                otherNames = undefined;
-              }
-            }
-
             return {
               type: "region",
               id: regionDocument.id,
               slug: regionDocument.slug,
               transliteration: regionDocument.transliteration,
               primaryNames: regionDocument.names,
-              otherNames,
               booksCount: regionDocument.booksCount ?? 0,
               _nameVariations: dedupeStrings(
                 getNamesVariations([
-                  ...currentNames
-                    .filter((n) => n?.text)
-                    .map((n) => n.text),
-                  ...(Array.isArray(regionDocument.subLocations)
-                    ? regionDocument.subLocations
-                      .filter((n) => n?.text)
-                      .map((n) => n.text)
-                    : []),
+                  ...regionDocument.names.map((n) => n.text),
                 ]),
               ),
               _popularity: regionDocument._popularity ?? 0,
@@ -301,6 +246,11 @@ export const prepareTypesenseSearchDocuments = async () => {
           slug: empireDocument.slug,
           primaryNames: empireDocument.names,
           booksCount: empireDocument.booksCount,
+          _nameVariations: dedupeStrings(
+            getNamesVariations([
+              ...empireDocument.names.map((n) => n.text),
+            ]),
+          ),
           _popularity: empireDocument._popularity,
           _rank: getRankByType(type),
         };

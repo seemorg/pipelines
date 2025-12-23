@@ -23,30 +23,10 @@ export const TYPESENSE_REGION_SCHEMA = (
       type: "object[]",
     },
     {
-      name: "currentNames",
-      type: "object[]",
-      optional: true,
-    },
-    {
       name: "transliteration",
       type: "string",
       optional: true,
       sort: true,
-    },
-    {
-      name: "currentNameTransliteration",
-      type: "string",
-      optional: true,
-    },
-
-    {
-      name: "subLocations",
-      type: "object[]",
-      optional: true,
-    },
-    {
-      name: "subLocationsCount",
-      type: "int32",
     },
     {
       name: "booksCount",
@@ -68,12 +48,7 @@ export interface TypesenseRegion {
   slug: string;
 
   names: { locale: string; text: string }[];
-  currentNames?: { locale: string; text: string }[];
   transliteration?: string;
-  currentNameTransliteration?: string;
-
-  subLocations?: { locale: string; text: string }[];
-  subLocationsCount: number;
 
   booksCount: number;
   authorsCount: number;
@@ -86,63 +61,27 @@ export const prepareTypesenseRegionsData = async () => {
       id: true,
       slug: true,
       transliteration: true,
-      currentNameTransliteration: true,
       numberOfAuthors: true,
       numberOfBooks: true,
-      currentNameTranslations: {
-        select: {
-          locale: true,
-          text: true,
-        },
-      },
       nameTranslations: {
         select: {
           locale: true,
           text: true,
         },
       },
-      locations: {
-        select: {
-          cityNameTranslations: {
-            select: {
-              locale: true,
-              text: true,
-            },
-          },
-        },
-      },
     },
   });
 
   return regions.map((region): TypesenseRegion => {
-    const subLocations = region.locations.flatMap(
-      (l) => l.cityNameTranslations,
-    );
-
-    // remove duplicates
-    const uniqueSubLocations = (subLocations ?? []).filter(
-      (value, index, self) =>
-        index ===
-        self.findIndex(
-          (t) => t.locale === value.locale && t.text === value.text,
-        ),
-    );
 
     return {
-      id: region.slug,
+      id: region.id,
       slug: region.slug,
       names: region.nameTranslations,
       transliteration: region.transliteration ?? undefined,
-      ...(region.currentNameTranslations.length > 0 && {
-        currentNames: region.currentNameTranslations,
-      }),
-      currentNameTransliteration:
-        region.currentNameTransliteration ?? undefined,
       booksCount: region.numberOfBooks,
       authorsCount: region.numberOfAuthors,
       _popularity: region.numberOfBooks + region.numberOfAuthors,
-      subLocations: uniqueSubLocations,
-      subLocationsCount: uniqueSubLocations.length,
     };
   });
 };
