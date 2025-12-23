@@ -44,11 +44,6 @@ export const TYPESENSE_AUTHOR_SCHEMA = (
       type: "string[]",
     },
     {
-      name: "geographies",
-      type: "string[]",
-      facet: true,
-    },
-    {
       name: "regions",
       type: "string[]",
       facet: true,
@@ -96,7 +91,6 @@ export interface AuthorDocument {
     locale: string;
     texts: string[];
   }[];
-  geographies: string[];
   regions: string[];
   empires: string[];
   _nameVariations?: string[];
@@ -130,7 +124,6 @@ export const prepareTypesenseAuthorsData = async () => {
         },
       },
       otherNameTransliterations: true,
-      locations: true,
       empires: true,
       regions: true,
       _count: {
@@ -153,7 +146,6 @@ export const prepareTypesenseAuthorsData = async () => {
         author.otherNameTranslations.length === 0
           ? [{ texts: [], locale: "en" }]
           : author.otherNameTranslations,
-      geographies: dedupeStrings(author.locations.map((l) => l.id)),
       regions: author.regions.map((r) => r.id),
       empires: author.empires.map((e) => e.id),
       booksCount: author._count.books,

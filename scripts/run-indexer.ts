@@ -3,7 +3,9 @@
  * Script to run individual Typesense indexing functions manually
  * 
  * Usage:
- *   pnpm tsx scripts/run-indexer.ts <indexer-name>
+ *   pnpm tsx scripts/run-indexer.ts [indexer-name]
+ * 
+ * If no indexer name is provided, an interactive prompt will ask you to select one.
  * 
  * Available indexers:
  *   - authors
@@ -20,6 +22,7 @@
 import { readFileSync, existsSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
+import inquirer from "inquirer";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -137,16 +140,33 @@ async function main() {
     process.exit(1);
   }
 
-  const indexerName = process.argv[2];
+  let indexerName: string | undefined = process.argv[2];
 
+  // If no indexer name provided, prompt interactively
   if (!indexerName) {
-    console.error("❌ Please specify an indexer name");
-    console.error("\nUsage: pnpm tsx scripts/run-indexer.ts <indexer-name>");
-    console.error("\nAvailable indexers:");
-    Object.keys(indexerModules).forEach((name) => {
-      console.error(`  - ${name}`);
-    });
-    console.error("  - all (runs all indexers in sequence)");
+    const allOptions = [
+      ...Object.keys(indexerModules),
+      "all",
+    ];
+
+    const answer = await inquirer.prompt<{ indexer: string }>([
+      {
+        type: "list",
+        name: "indexer",
+        message: "Which indexer would you like to run?",
+        choices: allOptions.map((name) => ({
+          name: name === "all" ? `${name} (runs all indexers in sequence)` : name,
+          value: name,
+        })),
+      },
+    ]);
+
+    indexerName = answer.indexer;
+  }
+
+  // TypeScript guard: indexerName should be defined at this point
+  if (!indexerName) {
+    console.error("❌ No indexer selected");
     process.exit(1);
   }
 

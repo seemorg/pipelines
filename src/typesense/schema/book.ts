@@ -59,11 +59,6 @@ export const TYPESENSE_BOOK_SCHEMA = (
       optional: true,
     },
     {
-      name: "geographies",
-      type: "string[]",
-      facet: true,
-    },
-    {
       name: "regions",
       type: "string[]",
       facet: true,
@@ -119,7 +114,6 @@ export interface TypesenseBook {
   _nameVariations: string[];
   _popularity: number;
   year?: number;
-  geographies: string[];
   regions: string[];
   empires: string[];
   genreIds: string[];
@@ -215,7 +209,6 @@ export const prepareTypesenseBooksData = async () => {
         _nameVariations: author._nameVariations,
         booksCount: author.booksCount,
       },
-      geographies: author.geographies,
       regions: author.regions,
       empires: author.empires,
       _popularity: author._popularity,
