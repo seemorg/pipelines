@@ -31,6 +31,24 @@ export const TYPESENSE_EMPIRE_SCHEMA = (
       type: "int32",
     },
     {
+      name: "transliteration",
+      type: "string",
+      optional: true,
+      sort: true,
+    },
+    {
+      name: "hijriStartYear",
+      type: "int32",
+      optional: true,
+      sort: true,
+    },
+    {
+      name: "hijriEndYear",
+      type: "int32",
+      optional: true,
+      sort: true,
+    },
+    {
       name: "_popularity",
       type: "int32",
     },
@@ -40,9 +58,10 @@ export const TYPESENSE_EMPIRE_SCHEMA = (
 export interface TypesenseEmpire {
   id: string;
   slug: string;
-
   names: { locale: string; text: string }[];
-
+  transliteration?: string;
+  hijriStartYear?: number;
+  hijriEndYear?: number;
   booksCount: number;
   authorsCount: number;
   _popularity: number;
@@ -55,6 +74,9 @@ export const prepareTypesenseEmpiresData = async () => {
       slug: true,
       numberOfAuthors: true,
       numberOfBooks: true,
+      transliteration: true,
+      hijriStartYear: true,
+      hijriEndYear: true,
       nameTranslations: {
         select: {
           locale: true,
@@ -69,8 +91,12 @@ export const prepareTypesenseEmpiresData = async () => {
       id: empire.id,
       slug: empire.slug,
       names: empire.nameTranslations,
+      transliteration: empire.transliteration ?? undefined,
+      hijriStartYear: empire.hijriStartYear ?? undefined,
+      hijriEndYear: empire.hijriEndYear ?? undefined,
       booksCount: empire.numberOfBooks,
       authorsCount: empire.numberOfAuthors,
+
       _popularity: empire.numberOfBooks + empire.numberOfAuthors,
     };
   });
