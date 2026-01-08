@@ -92,8 +92,8 @@ export const prepareTypesenseEmpiresData = async () => {
       slug: empire.slug,
       names: empire.nameTranslations,
       transliteration: empire.transliteration ?? undefined,
-      hijriStartYear: empire.hijriStartYear ?? undefined,
-      hijriEndYear: empire.hijriEndYear ?? undefined,
+      hijriStartYear: empire.hijriStartYear ?? 0,
+      hijriEndYear: empire.hijriEndYear ?? 0,
       booksCount: empire.numberOfBooks,
       authorsCount: empire.numberOfAuthors,
 

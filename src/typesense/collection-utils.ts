@@ -64,11 +64,18 @@ export async function cleanupOldCollections(
             try {
                 await client.collections(collection.name).delete();
                 console.log(`Deleted old collection: ${collection.name}`);
-            } catch (error) {
-                console.error(
-                    `Failed to delete collection ${collection.name}:`,
-                    error,
-                );
+            } catch (error: any) {
+                // If collection doesn't exist (404), it was already deleted - that's fine
+                if (error?.httpStatus === 404) {
+                    console.log(
+                        `Collection ${collection.name} already deleted or doesn't exist`,
+                    );
+                } else {
+                    console.error(
+                        `Failed to delete collection ${collection.name}:`,
+                        error,
+                    );
+                }
                 // Continue with other deletions even if one fails
             }
         }
@@ -119,11 +126,18 @@ export async function swapAlias(
         try {
             console.log(`Deleting old collection: ${oldCollectionName}`);
             await client.collections(oldCollectionName).delete();
-        } catch (error) {
-            console.error(
-                `Failed to delete old collection ${oldCollectionName}:`,
-                error,
-            );
+        } catch (error: any) {
+            // If collection doesn't exist (404), it was already deleted - that's fine
+            if (error?.httpStatus === 404) {
+                console.log(
+                    `Collection ${oldCollectionName} already deleted or doesn't exist`,
+                );
+            } else {
+                console.error(
+                    `Failed to delete old collection ${oldCollectionName}:`,
+                    error,
+                );
+            }
             // Don't throw - old collection deletion failure shouldn't break indexing
         }
     }
