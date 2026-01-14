@@ -3,7 +3,6 @@ import { dedupeStrings, getNamesVariations } from "@/utils";
 
 import { prepareTypesenseAuthorsData } from "./author";
 import { prepareTypesenseBooksData } from "./book";
-import { prepareTypesenseGenresData } from "./genre";
 import { prepareTypesenseRegionsData } from "./region";
 import { prepareTypesenseEmpiresData } from "./empire";
 import { prepareTypesenseAdvancedGenresData } from "./advancedGenre";
@@ -82,7 +81,6 @@ export const TYPESENSE_SEARCH_SCHEMA = (
 const types = [
   "author",
   "book",
-  "genre",
   "advanced-genre",
   "region",
   "empire",
@@ -127,12 +125,11 @@ export interface SearchDocument {
 const getRankByType = (type: SearchDocumentType) => {
   if (type === "region") return 1;
   if (type === "empire") return 2;
-  if (type === "genre") return 3;
-  if (type === "advanced-genre") return 4;
-  if (type === "author") return 5;
+  if (type === "advanced-genre") return 3;
+  if (type === "author") return 4;
 
   // book
-  return 6;
+  return 5;
 };
 
 export const prepareTypesenseSearchDocuments = async () => {
@@ -182,22 +179,6 @@ export const prepareTypesenseSearchDocuments = async () => {
             otherNames: bookDocument.author.otherNames,
             _nameVariations: bookDocument.author._nameVariations,
           },
-        };
-      });
-    }
-
-    if (type === "genre") {
-      const data = await prepareTypesenseGenresData();
-      iterationDocuments = data.map((genreDocument): SearchDocument => {
-        return {
-          type: "genre",
-          id: genreDocument.id,
-          slug: genreDocument.slug,
-          transliteration: genreDocument.transliteration ?? undefined,
-          booksCount: genreDocument.booksCount,
-          primaryNames: genreDocument.nameTranslations,
-          _popularity: genreDocument._popularity,
-          _rank: getRankByType(type),
         };
       });
     }
