@@ -10,7 +10,6 @@
  * Available indexers:
  *   - authors
  *   - books
- *   - genres
  *   - advanced-genres
  *   - regions
  *   - empires
@@ -96,7 +95,6 @@ const requiredForIndexing = ["DATABASE_URL", "TYPESENSE_URL", "TYPESENSE_API_KEY
 const indexerModules: Record<string, string> = {
   authors: "@/typesense/index-authors",
   books: "@/typesense/index-books",
-  genres: "@/typesense/index-genres",
   "advanced-genres": "@/typesense/index-advanced-genres",
   regions: "@/typesense/index-regions",
   empires: "@/typesense/index-empires",
@@ -107,7 +105,6 @@ const indexerModules: Record<string, string> = {
 const indexerFunctions: Record<string, string> = {
   authors: "indexAuthors",
   books: "indexBooks",
-  genres: "indexTypesenseGenres",
   "advanced-genres": "indexTypesenseAdvancedGenres",
   regions: "indexTypesenseRegions",
   empires: "indexTypesenseEmpires",
@@ -178,7 +175,6 @@ async function main() {
     const allIndexers: Array<keyof typeof indexerModules> = [
       "authors",
       "books",
-      "genres",
       "advanced-genres",
       "regions",
       "empires",

@@ -4,7 +4,6 @@ import type ImportError from "typesense/lib/Typesense/Errors/ImportError.js";
 import { purgeAllCloudflareCache } from "@/lib/cloudflare";
 import { indexAuthors } from "@/typesense/index-authors";
 import { indexBooks } from "@/typesense/index-books";
-import { indexTypesenseGenres } from "@/typesense/index-genres";
 import { indexTypesenseAdvancedGenres } from "@/typesense/index-advanced-genres";
 import { indexTypesenseRegions } from "@/typesense/index-regions";
 import { indexTypesenseSearch } from "@/typesense/index-search";
@@ -21,9 +20,6 @@ export default async function typesenseWorker(
     await indexBooks();
     await job.updateProgress(40);
 
-    await indexTypesenseGenres();
-    await job.updateProgress(50);
-
     await indexTypesenseAdvancedGenres();
     await job.updateProgress(60);
 
@@ -31,7 +27,7 @@ export default async function typesenseWorker(
     await job.updateProgress(70);
 
     await indexTypesenseEmpires();
-    await job.updateProgress(80);
+    await job.updateProgress(90);
 
     await indexTypesenseSearch();
     await job.updateProgress(100);
