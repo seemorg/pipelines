@@ -1,10 +1,6 @@
-FROM node:22.12.0-slim AS base
-
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
-
-RUN npm install -g corepack@latest
-RUN corepack enable
+ARG NODE_VERSION=22.12.0
+ARG PNPM_VERSION=9.15.4
+FROM node:${NODE_VERSION}-slim AS base
 
 WORKDIR /app
 
@@ -31,17 +27,20 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 FROM base AS builder
 
-ARG PNPM_VERSION=9.15.4
-RUN npm install -g pnpm@$PNPM_VERSION
+RUN apt-get update -qq && \
+    apt-get install --no-install-recommends -y build-essential node-gyp pkg-config python-is-python3
+
+# Install pnpm
+RUN npm install -g pnpm@${PNPM_VERSION} && \
+    pnpm --version
 
 COPY . .
+
 RUN pnpm install --frozen-lockfile
+
 RUN pnpm run build
 
 FROM base AS runner
-
-ARG PNPM_VERSION=9.15.4
-RUN npm install -g pnpm@$PNPM_VERSION
 
 # Copy built application
 COPY --from=builder /app/node_modules /app/node_modules
