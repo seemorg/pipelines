@@ -31,16 +31,27 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 FROM base AS builder
 
+ARG PNPM_VERSION=9.15.4
+RUN npm install -g pnpm@$PNPM_VERSION
+
 COPY . .
 RUN pnpm install --frozen-lockfile
 RUN pnpm run build
 
 FROM base AS runner
+
+ARG PNPM_VERSION=9.15.4
+RUN npm install -g pnpm@$PNPM_VERSION
+
+# Copy built application
 COPY --from=builder /app/node_modules /app/node_modules
-COPY --from=builder /app/src /app/src
 COPY --from=builder /app/dist /app/dist
 COPY --from=builder /app/package.json /app/package.json
 
-EXPOSE ${PORT}
+# Set default PORT if not provided
+ENV PORT=8080
+ENV NODE_ENV="production"
 
-CMD [ "pnpm", "start" ]
+EXPOSE 8080
+
+CMD [ "npm", "start" ]

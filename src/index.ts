@@ -6,7 +6,7 @@ import { setUptime } from "./lib/uptime";
 
 showRoutes(app);
 
-let port = 3000;
+let port = 8080;
 if (process.env.PORT) {
   const portInt = parseInt(process.env.PORT);
   if (portInt && !isNaN(portInt)) {
