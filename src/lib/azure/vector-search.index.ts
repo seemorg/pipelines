@@ -114,7 +114,7 @@ const index: SearchIndex = {
         vectorizerName: "vector-search-vectorizer",
         kind: "azureOpenAI",
         parameters: {
-          resourceUrl: `https://${env.AZURE_OPENAI_RESOURCE_NAME}.openai.azure.com`,
+          resourceUrl: `https://${env.AZURE_OPENAI_RESOURCE_NAME}.cognitiveservices.azure.com/`,
           deploymentId: env.AZURE_EMBEDDINGS_DEPLOYMENT_NAME,
           modelName: "text-embedding-3-large",
         },
