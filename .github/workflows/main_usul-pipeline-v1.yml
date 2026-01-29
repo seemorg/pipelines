@@ -44,29 +44,4 @@ jobs:
     steps:
       - name: Trigger Azure Container Registry webhook
         run: |
-          curl -X POST "${{ secrets.AZURE_DEPLOYMENT_WEBHOOK_URL }}" \
-            -H "Content-Type: application/json"
-
-      - name: Monitor Azure deployment status
-        run: |
-          echo "⏳ Waiting for deployment to start..."
-          sleep 15
-
-          SCM_BASE_URL="https://usul-pipeline-v1-ahctdrccfdabhhfk.scm.eastus-01.azurewebsites.net"
-          APP_URL="https://usul-pipeline-v1-ahctdrccfdabhhfk.eastus-01.azurewebsites.net"
-
-          echo ""
-          echo "📊 Deployment monitoring URLs:"
-          echo "   Latest deployment: $SCM_BASE_URL/api/deployments/latest"
-          echo "   All deployments: $SCM_BASE_URL/api/deployments"
-          echo "   Kudu dashboard: $SCM_BASE_URL"
-          echo "   App URL: $APP_URL"
-          echo ""
-
-          # Try to check if app is responding (optional health check)
-          echo "🔍 Checking if app is responding..."
-          if curl -f -s -o /dev/null -w "%{http_code}" --max-time 10 "$APP_URL" | grep -q "200\|301\|302"; then
-            echo "✅ App is responding"
-          else
-            echo "⏳ App may still be deploying..."
-          fi
+          curl -i -X POST "${{ secrets.AZURE_DEPLOYMENT_WEBHOOK_URL }}"
