@@ -29,7 +29,9 @@ jobs:
         with:
           context: .
           push: true
-          tags: index.docker.io/engineeringusul/usul-pipeline:${{ github.sha }}
+          tags: |
+            index.docker.io/engineeringusul/usul-pipeline:${{ github.sha }}
+            index.docker.io/engineeringusul/usul-pipeline:latest
           file: ./Dockerfile
 
   deploy:
