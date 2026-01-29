@@ -15,27 +15,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Node.js version
-        uses: actions/setup-node@v3
-        with:
-          node-version: '22.x'
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
         with:
-          version: 9.15.4
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-      - name: npm install, build, and test
-        run: |
-          npm install
-          npm run build --if-present
-          npm run test --if-present
-
-      - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v4
+      - name: Build and push container image to registry
+        uses: docker/build-push-action@v3
         with:
-          name: node-app
-          path: .
+          context: .
+          push: true
+          tags: index.docker.io/engineeringusul/usul-pipeline:${{ github.sha }}
+          file: ./Dockerfile
 
   deploy:
     runs-on: ubuntu-latest
@@ -45,23 +40,31 @@ jobs:
       contents: read #This is required for actions/checkout
 
     steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v4
-        with:
-          name: node-app
-      
-      - name: Login to Azure
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_E4000C6697A947469A7EEC0C9DE51487 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_6E4AD2B5CA454D8BAC8269E871000147 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_CB917B1AD9204E6B8F6F1C4C21B8035F }}
+      - name: Trigger Azure Container Registry webhook
+        run: |
+          curl -X POST "${{ secrets.AZURE_DEPLOYMENT_WEBHOOK_URL }}" \
+            -H "Content-Type: application/json"
 
-      - name: 'Deploy to Azure Web App'
-        id: deploy-to-webapp
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name: 'usul-pipeline-v1'
-          slot-name: 'Production'
-          package: .
-          
+      - name: Monitor Azure deployment status
+        run: |
+          echo "⏳ Waiting for deployment to start..."
+          sleep 15
+
+          SCM_BASE_URL="https://usul-pipeline-v1-ahctdrccfdabhhfk.scm.eastus-01.azurewebsites.net"
+          APP_URL="https://usul-pipeline-v1-ahctdrccfdabhhfk.eastus-01.azurewebsites.net"
+
+          echo ""
+          echo "📊 Deployment monitoring URLs:"
+          echo "   Latest deployment: $SCM_BASE_URL/api/deployments/latest"
+          echo "   All deployments: $SCM_BASE_URL/api/deployments"
+          echo "   Kudu dashboard: $SCM_BASE_URL"
+          echo "   App URL: $APP_URL"
+          echo ""
+
+          # Try to check if app is responding (optional health check)
+          echo "🔍 Checking if app is responding..."
+          if curl -f -s -o /dev/null -w "%{http_code}" --max-time 10 "$APP_URL" | grep -q "200\|301\|302"; then
+            echo "✅ App is responding"
+          else
+            echo "⏳ App may still be deploying..."
+          fi
