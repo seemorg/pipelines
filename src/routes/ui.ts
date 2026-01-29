@@ -12,6 +12,7 @@ import { booksQueue } from "../queues/book/queue";
 import { keywordIndexerQueue } from "../queues/keyword-indexer/queue";
 import { regenerationQueue } from "../queues/regeneration/queue";
 import { typesenseQueue } from "../queues/typesense/queue";
+import indexAllRoutes from "./index-all";
 
 const basePath = "/ui";
 const uiRoutes = new Hono().basePath(basePath);
@@ -24,6 +25,8 @@ uiRoutes.use(
 );
 
 const serverAdapter = new HonoAdapter(serveStatic).setBasePath(basePath);
+
+uiRoutes.route("/index", indexAllRoutes);
 
 createBullBoard({
   queues: [
