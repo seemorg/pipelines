@@ -9,7 +9,7 @@ export const worker = new Worker<AiIndexerQueueData>(
   path.resolve("dist/workers/ai-indexer.worker.js"),
   {
     connection: AI_INDEXER_QUEUE_REDIS,
-    concurrency: 4,
+    concurrency: 20,
     lockDuration: 1000 * 60 * 40, // 40 minutes
     // stalledInterval: 1000 * 60 * 40, // 40 minutes
   },
