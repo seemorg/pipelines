@@ -18,6 +18,7 @@ export const env = createEnv({
     AZURE_SEARCH_ENDPOINT: z.string(),
     AZURE_SEARCH_KEY: z.string(),
     AZURE_SEARCH_INDEX: z.string(),
+    AZURE_SEARCH_INDEXES: z.string().optional(),
     AZURE_KEYWORD_SEARCH_INDEX: z.string(),
 
     REPLICATE_API_TOKEN: z.string().min(1),
