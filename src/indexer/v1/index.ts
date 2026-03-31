@@ -3,12 +3,7 @@ import type { Metadata, TextNode } from "llamaindex";
 import { fetchBookContent, OcrBookResponse } from "@/book-fetchers";
 import { OpenitiBookResponse } from "@/book-fetchers/openiti";
 import { TurathBookResponse } from "@/book-fetchers/turath";
-import {
-  getVectorSearchClientForIndexing,
-  isStorageQuotaError,
-  markPrimaryIndexFull,
-} from "@/lib/azure/vector-search.index";
-import { createRedis } from "@/lib/redis";
+import { vectorSearchClient } from "@/lib/azure/vector-search.index";
 import { db } from "@/lib/db";
 import { embeddings } from "@/lib/openai";
 import { chunk } from "@/utils";
@@ -188,15 +183,6 @@ export async function indexBook(
     }
   }
 
-  const redis = createRedis();
-  let vectorClient: Awaited<ReturnType<typeof getVectorSearchClientForIndexing>>;
-  try {
-    vectorClient = await getVectorSearchClientForIndexing(book.id, redis);
-  } catch (e) {
-    redis.quit();
-    throw e;
-  }
-
   const batches = chunk(nodes, 30);
   let i = 0;
 
@@ -204,7 +190,6 @@ export async function indexBook(
   const versionValue = versionToIndex.value;
 
   let activeBatch = 0;
-  try {
   for (const batch of batches) {
     console.log(`Embedding batch ${++activeBatch} / ${batches.length}`);
 
@@ -260,24 +245,10 @@ export async function indexBook(
       }),
     );
 
-    try {
-      await vectorClient.mergeOrUploadDocuments(embeddingsResult);
-    } catch (error) {
-      if (isStorageQuotaError(error)) {
-        console.warn(
-          "Primary vector index hit storage quota, marking as full for fallback to secondary index",
-        );
-        await markPrimaryIndexFull(redis);
-        throw error;
-      }
-      throw error;
-    }
+    await vectorSearchClient.mergeOrUploadDocuments(embeddingsResult);
 
     i++;
   }
 
   return { status: "success", versionId: versionToIndex.value };
-  } finally {
-    redis.quit();
-  }
 }
